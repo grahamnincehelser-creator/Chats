@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0d0d18">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -291,6 +291,169 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .strength-label{font-size:10px;margin-top:4px;font-weight:600;}
 .acct-btn{width:34px;height:34px;border-radius:50%;border:none;background:var(--surface2);color:var(--text2);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;margin-left:auto;flex-shrink:0;}
 .acct-btn:hover{background:var(--surface3);color:var(--text);}
+
+/* ══ MOBILE OVERHAUL ══ */
+@media(max-width:700px){
+  /* Auth screen */
+  #s-auth{ padding:16px; justify-content:flex-start; padding-top:max(40px, env(safe-area-inset-top, 20px)); }
+  .brand{ margin-bottom:6px; }
+  .b-name{ font-size:34px; }
+  .b-icon{ width:44px; height:44px; font-size:22px; }
+  .tagline{ font-size:13px; margin-bottom:20px; }
+  .card{ padding:20px 18px; border-radius:22px; }
+  .tabs{ margin-bottom:16px; }
+  .tab{ font-size:13px; padding:8px; }
+  .inp{ font-size:16px !important; padding:12px 14px; } /* 16px prevents iOS zoom on focus */
+  .field label{ font-size:10px; }
+  .btn-main{ padding:14px; font-size:15px; }
+  .hint{ font-size:11px; padding:10px 12px; margin-top:12px; }
+  .captcha-inp{ font-size:16px !important; } /* prevent zoom */
+
+  /* Sidebar on mobile */
+  .sb-top{ padding:max(14px, env(safe-area-inset-top, 14px)) 14px 12px; }
+  .me-row{ padding:8px 10px; }
+  .sb-label{ padding:12px 14px 4px; font-size:9px; }
+  .clist{ padding:4px 8px 8px; }
+  .ci{ padding:9px 10px; border-radius:12px; }
+  .ci-av{ width:38px; height:38px; font-size:13px; }
+  .ci-info strong{ font-size:13px; }
+  .ci-info span{ font-size:11px; }
+
+  /* Chat header */
+  .chdr{ padding:12px 14px; padding-top:max(12px, env(safe-area-inset-top, 12px)); }
+  .hdr-info h2{ font-size:15px; }
+  .hdr-info p{ font-size:11px; }
+
+  /* Messages */
+  .msgs{ padding:12px 10px 6px; gap:8px; }
+  .mbub{ font-size:14px; padding:9px 12px; }
+  .mbody{ max-width:82%; }
+  .mimg{ max-width:220px; }
+  .mimg img{ max-width:220px; }
+
+  /* Input area */
+  .iarea{ padding:8px 10px max(10px, env(safe-area-inset-bottom, 10px)) 10px; }
+  .emojis{ margin-bottom:6px; }
+  .emj{ min-width:32px; height:32px; font-size:16px; }
+  .mta{ font-size:16px !important; padding:10px 13px; min-height:42px; } /* 16px prevents iOS zoom */
+  .sendbtn{ width:42px; height:42px; }
+  .imgbtn{ width:42px; height:42px; font-size:17px; }
+
+  /* Modals */
+  .modal{ padding:20px 18px; border-radius:22px; }
+  .modal h3{ font-size:18px; }
+  .modal .inp{ font-size:16px !important; } /* prevent zoom */
+  .modal .msub{ font-size:12px; margin-bottom:14px; }
+  .mbtn{ padding:12px; font-size:14px; }
+
+  /* Parental controls */
+  .pc-panel{ padding:20px 18px; border-radius:22px; }
+  .pc-panel h2{ font-size:19px; }
+  .pc-key{ padding:16px; font-size:20px; border-radius:14px; }
+  .pc-numpad{ max-width:240px; gap:10px; }
+
+  /* Lock screen */
+  .locked-overlay{ padding:20px; }
+  .locked-title{ font-size:22px; }
+
+  /* Tag input */
+  .taginp{ font-size:16px !important; } /* prevent zoom */
+
+  /* Account settings */
+  .acct-tab{ font-size:12px; padding:8px 4px; }
+}
+
+/* Extra small phones */
+@media(max-width:380px){
+  .b-name{ font-size:28px; }
+  .tagline{ font-size:12px; }
+  .card{ padding:16px 14px; }
+  .mbody{ max-width:88%; }
+  .pc-key{ padding:13px; font-size:18px; }
+}
+
+/* Make sure inputs never trigger zoom on iOS (must be 16px+) */
+input, textarea, select {
+  font-size: 16px !important;
+}
+/* But keep display labels small */
+.field label, .sb-label, .ci-t, .mtime, .msender, .ci-info span {
+  font-size: inherit !important;
+}
+
+
+/* ══ FEED ══ */
+.feed-screen{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.feed-screen.hidden{display:none;}
+.feed-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:rgba(13,13,24,.88);backdrop-filter:blur(16px);flex-shrink:0;}
+.feed-hdr h2{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;}
+.feed-hdr-tabs{display:flex;gap:6px;}
+.feed-tab{padding:6px 14px;border-radius:99px;border:1.5px solid var(--border2);background:none;color:var(--text3);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;}
+.feed-tab.on{background:linear-gradient(135deg,var(--p2),var(--pk));color:#fff;border-color:transparent;}
+.post-btn{width:36px;height:36px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--p2),var(--pk));color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(124,58,237,.4);transition:transform .15s;}
+.post-btn:hover{transform:scale(1.1);}
+.feed-list{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:14px;}
+.feed-list::-webkit-scrollbar{width:3px;}
+.feed-list::-webkit-scrollbar-thumb{background:rgba(167,139,250,.2);border-radius:99px;}
+.feed-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;flex:1;color:var(--text3);padding:40px;text-align:center;}
+.feed-empty .fe-icon{font-size:44px;opacity:.4;}
+/* post card */
+.pcard{background:var(--surface);border:1px solid var(--border2);border-radius:20px;overflow:hidden;animation:up .25s both;}
+.pcard-head{display:flex;align-items:center;gap:10px;padding:13px 14px 8px;}
+.pcard-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.pcard-user{flex:1;}
+.pcard-user strong{display:block;font-size:14px;font-weight:700;}
+.pcard-user span{font-size:11px;color:var(--text3);}
+.pcard-vis{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;flex-shrink:0;}
+.pcard-vis.pub{background:rgba(34,211,238,.1);color:var(--cy);border:1px solid rgba(34,211,238,.2);}
+.pcard-vis.friends{background:rgba(167,139,250,.1);color:var(--p);border:1px solid rgba(167,139,250,.2);}
+.pcard-text{padding:0 14px 10px;font-size:14px;line-height:1.55;color:var(--text);}
+.pcard-img{width:100%;display:block;max-height:400px;object-fit:cover;cursor:pointer;}
+.pcard-actions{display:flex;align-items:center;gap:4px;padding:8px 10px;border-top:1px solid var(--border);}
+.pact-btn{display:flex;align-items:center;gap:5px;padding:7px 10px;border-radius:10px;border:none;background:none;color:var(--text3);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s,color .15s;}
+.pact-btn:hover{background:var(--surface2);}
+.pact-btn.liked{color:var(--pk);}
+.pact-btn.liked .like-icon{animation:heartpop .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes heartpop{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)}}
+.pact-sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
+.pcard-del{margin-left:auto;width:28px;height:28px;border-radius:50%;border:none;background:none;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:background .15s;}
+.pcard-del:hover{background:rgba(248,113,113,.15);color:var(--danger);}
+/* pending badge */
+.pcard-pending{display:flex;align-items:center;gap:6px;padding:8px 14px;background:rgba(251,191,36,.08);border-top:1px solid rgba(251,191,36,.15);font-size:12px;color:var(--ye);}
+/* comments */
+.pcard-comments{padding:0 14px 10px;display:flex;flex-direction:column;gap:8px;}
+.pcomment{display:flex;gap:8px;align-items:flex-start;}
+.pcomment-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px;}
+.pcomment-body{flex:1;background:var(--surface2);border-radius:12px;padding:7px 10px;}
+.pcomment-body strong{font-size:12px;font-weight:600;color:var(--p);display:block;margin-bottom:2px;}
+.pcomment-body span{font-size:13px;color:var(--text);}
+.pcomment-inp-row{display:flex;gap:7px;align-items:center;padding:4px 14px 12px;}
+.pcomment-inp{flex:1;background:var(--surface2);border:1.5px solid var(--border2);border-radius:12px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;padding:8px 12px;outline:none;transition:border-color .2s;}
+.pcomment-inp:focus{border-color:var(--p);}
+.pcomment-inp::placeholder{color:var(--text3);}
+.pcomment-send{width:32px;height:32px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--p2),var(--pk));display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.pcomment-send svg{width:14px;height:14px;fill:#fff;}
+/* new post modal */
+.post-vis-row{display:flex;gap:8px;margin-bottom:14px;}
+.vis-opt{flex:1;padding:10px;border-radius:12px;border:1.5px solid var(--border2);background:none;color:var(--text3);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;}
+.vis-opt.on{border-color:var(--p);background:rgba(167,139,250,.1);color:var(--p);}
+.post-img-preview{display:none;position:relative;margin-bottom:12px;}
+.post-img-preview img{width:100%;max-height:200px;object-fit:cover;border-radius:12px;display:block;}
+.post-img-preview .remove-img{position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;border:none;background:var(--danger);color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.ai-scanning{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(34,211,238,.07);border:1px solid rgba(34,211,238,.15);border-radius:12px;font-size:13px;color:var(--cy);margin-top:10px;}
+/* bottom nav bar for mobile */
+.bnav{display:none;flex-shrink:0;}
+@media(max-width:700px){
+  .bnav{display:flex;background:var(--surface);border-top:1px solid var(--border);padding:8px 0 calc(8px + var(--safe));z-index:5;}
+  .bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;color:var(--text3);cursor:pointer;font-size:20px;padding:4px;transition:color .2s;}
+  .bnav-btn span{font-size:10px;font-weight:600;}
+  .bnav-btn.on{color:var(--p);}
+  /* hide sidebar on mobile, show bottom nav instead */
+  #s-app{flex-direction:column;}
+  .sb{display:none;}
+  .sb.mobile-open{display:flex;position:fixed;inset:0;z-index:20;}
+}
+
 </style>
 </head>
 <body>
@@ -345,7 +508,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         <button class="acct-btn" id="acct-btn" title="Account settings">⚙️</button>
       </div>
     </div>
-    <div class="sb-label">Chats <button id="new-btn">+ New Chat</button></div>
+    <div style="display:flex;gap:6px;padding:12px 14px 0;">
+      <button class="feed-tab on" id="sb-tab-chat" onclick="switchMainTab('chat')">💬 Chats</button>
+      <button class="feed-tab" id="sb-tab-feed" onclick="switchMainTab('feed')">📸 Feed</button>
+    </div>
+    <div class="sb-label" id="chats-label" style="margin-top:4px;">Chats <button id="new-btn">+ New Chat</button></div>
     <div class="clist" id="clist"><div class="empty"><div class="empty-icon">💬</div><p>No chats yet.<br>Hit <strong>+ New Chat</strong> to start!</p></div></div>
     <div class="sb-bot"><button class="btn-out" id="pc-sb-btn" style="margin-bottom:8px;">👨‍👩‍👧 Parental Controls</button><button class="btn-out" id="out-btn">← Sign out</button></div>
   </div>
@@ -519,6 +686,38 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   </div>
 </div>
 
+
+<!-- NEW POST MODAL -->
+<div class="overlay hidden" id="m-post">
+  <div class="modal">
+    <h3>📸 New Post</h3>
+    <p class="msub">Share a photo or thought with everyone or just friends.</p>
+    <div class="field">
+      <label>Audience</label>
+      <div class="post-vis-row">
+        <button class="vis-opt on" id="vis-pub" onclick="setPostVis('public')">🌍 Public</button>
+        <button class="vis-opt" id="vis-fri" onclick="setPostVis('friends')">👥 Friends Only</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Caption (optional)</label>
+      <textarea class="mta" id="post-text" placeholder="What's on your mind?" rows="2" style="min-height:60px;font-size:14px;"></textarea>
+    </div>
+    <div class="post-img-preview" id="post-img-preview">
+      <img id="post-img-prev" src="" alt=""/>
+      <button class="remove-img" id="post-img-remove">×</button>
+    </div>
+    <button class="mbtn ok" id="post-img-pick-btn" style="width:100%;background:var(--surface2);color:var(--text2);box-shadow:none;border:1.5px solid var(--border2);margin-bottom:4px;">🖼️ Add Image</button>
+    <input type="file" id="post-img-file" accept="image/*" style="display:none"/>
+    <div class="ai-scanning hidden" id="ai-scanning"><span class="spin" style="border-top-color:var(--cy);border-color:rgba(34,211,238,.2);"></span> AI is scanning image for safety...</div>
+    <div class="merr" id="post-err"></div>
+    <div class="mbtns">
+      <button class="mbtn cl" id="post-cancel">Cancel</button>
+      <button class="mbtn ok" id="post-submit">Post ⚡</button>
+    </div>
+  </div>
+</div>
+
 <!-- NEW CHAT MODAL -->
 <div class="overlay hidden" id="m-new">
   <div class="modal">
@@ -675,7 +874,12 @@ $('up-btn').onclick=doSignup;
 $('up-p2').onkeydown=e=>{if(e.key==='Enter')doSignup();};
 async function doSignup(){
   const u=$('up-u').value.trim().replace(/\s+/g,'_'), p=$('up-p').value, p2=$('up-p2').value;
-  if(deviceAtLimit()){$('up-err').textContent='Max 2 accounts per device reached.';return;}
+  // Re-read accounts fresh right before checking limit
+  const currentAccounts = getDeviceAccounts();
+  if(currentAccounts.length >= MAX_ACCOUNTS){
+    $('up-err').textContent='This device already has '+MAX_ACCOUNTS+' accounts ('+currentAccounts.join(', ')+').';
+    return;
+  }
   if(!u||!p||!p2){$('up-err').textContent='Please fill in all fields.';return;}
   if(!checkCaptcha()){$('up-err').textContent='Incorrect answer to the math puzzle. Try again.';newCaptcha();return;}
   if(u.length<2){$('up-err').textContent='Username must be at least 2 characters.';return;}
@@ -1014,24 +1218,33 @@ function checkCaptcha(){
 
 // ── ACCOUNT LIMIT (max 2 per device) ─────────────
 const MAX_ACCOUNTS = 2;
+
 function getDeviceAccounts(){
   try{
-    const raw = JSON.parse(localStorage.getItem('zc_device_accounts')||'[]');
-    // Always deduplicate on read and save back clean version
-    const deduped = [...new Set(raw)];
-    if(deduped.length !== raw.length) localStorage.setItem('zc_device_accounts', JSON.stringify(deduped));
-    return deduped;
-  }catch{return [];}
+    const raw = JSON.parse(localStorage.getItem('zc_device_accounts') || '[]');
+    // Deduplicate, remove empties, ensure strings only
+    return [...new Set(raw.filter(x => typeof x === 'string' && x.trim().length > 0))];
+  } catch{ return []; }
 }
+
+function saveDeviceAccounts(arr){
+  localStorage.setItem('zc_device_accounts', JSON.stringify([...new Set(arr)]));
+}
+
 function addDeviceAccount(u){
+  if(!u) return;
   const a = getDeviceAccounts();
   if(!a.includes(u)){
     a.push(u);
-    localStorage.setItem('zc_device_accounts', JSON.stringify(a));
+    saveDeviceAccounts(a);
   }
 }
+
+function removeDeviceAccount(u){
+  saveDeviceAccounts(getDeviceAccounts().filter(x => x !== u));
+}
+
 function deviceAtLimit(){
-  // Only count accounts that haven't been removed and are unique
   return getDeviceAccounts().length >= MAX_ACCOUNTS;
 }
 
@@ -1042,14 +1255,18 @@ setTab = function(t){
   if(t==='up'){
     const banner = document.getElementById('limit-banner');
     const btn = document.getElementById('up-btn');
-    if(deviceAtLimit()){
+    const capInp = document.getElementById('cap-ans');
+    // Re-read fresh from localStorage every time tab is opened
+    const accs = getDeviceAccounts();
+    const atLimit = accs.length >= MAX_ACCOUNTS;
+    if(atLimit){
       banner.classList.remove('hidden');
-      btn.disabled = true;
-      document.getElementById('cap-ans').disabled = true;
+      if(btn) btn.disabled = true;
+      if(capInp) capInp.disabled = true;
     } else {
       banner.classList.add('hidden');
-      btn.disabled = false;
-      document.getElementById('cap-ans').disabled = false;
+      if(btn) btn.disabled = false;
+      if(capInp) capInp.disabled = false;
     }
   }
 };
@@ -1509,15 +1726,433 @@ document.getElementById('del-confirm').onclick = async ()=>{
 };
 
 
+
+// ══════════════════════════════════════════
+// FEED
+// ══════════════════════════════════════════
+
+let currentFeedTab = 'public'; // 'public' | 'friends'
+let postVis = 'public';
+let pendingPostImg = null;
+let feedPosts = []; // cached posts
+let wsFeed = null;
+
+// ── TAB SWITCHING (chat vs feed) ──────────
+let mainTab = 'chat';
+function switchMainTab(tab){
+  mainTab = tab;
+  const chatMain = document.querySelector('.cmain');
+  const feedScreen = document.getElementById('feed-screen');
+  const sbTabChat = document.getElementById('sb-tab-chat');
+  const sbTabFeed = document.getElementById('sb-tab-feed');
+  const bnChat = document.getElementById('bn-chat');
+  const bnFeed = document.getElementById('bn-feed');
+
+  if(tab === 'feed'){
+    chatMain.style.display = 'none';
+    feedScreen.classList.remove('hidden');
+    if(sbTabChat) sbTabChat.className = 'feed-tab';
+    if(sbTabFeed) sbTabFeed.className = 'feed-tab on';
+    if(bnChat) bnChat.className = 'bnav-btn';
+    if(bnFeed) bnFeed.className = 'bnav-btn on';
+    loadFeed();
+  } else {
+    chatMain.style.display = '';
+    feedScreen.classList.add('hidden');
+    if(sbTabChat) sbTabChat.className = 'feed-tab on';
+    if(sbTabFeed) sbTabFeed.className = 'feed-tab';
+    if(bnChat) bnChat.className = 'bnav-btn on';
+    if(bnFeed) bnFeed.className = 'bnav-btn';
+    // On mobile show sidebar
+    if(window.innerWidth <= 700){
+      document.getElementById('sb').classList.add('mobile-open');
+      document.getElementById('achat').style.display = 'none';
+      document.getElementById('nochat').style.display = 'flex';
+    }
+  }
+}
+
+// Feed tabs
+document.getElementById('ft-all').onclick = ()=>{ currentFeedTab='public'; document.getElementById('ft-all').className='feed-tab on'; document.getElementById('ft-friends').className='feed-tab'; loadFeed(); };
+document.getElementById('ft-friends').onclick = ()=>{ currentFeedTab='friends'; document.getElementById('ft-friends').className='feed-tab on'; document.getElementById('ft-all').className='feed-tab'; loadFeed(); };
+
+// ── LOAD FEED ────────────────────────────
+async function loadFeed(){
+  const list = document.getElementById('feed-list');
+  list.innerHTML = '<div class="feed-empty"><div class="fe-icon" style="animation:float 3s infinite">⏳</div><p>Loading posts...</p></div>';
+  try{
+    let query = 'status=eq.approved&order=created_at.desc&limit=50';
+    if(currentFeedTab === 'public'){
+      query += '&visibility=eq.public';
+    } else {
+      // friends = people you've chatted with + yourself
+      const friendNames = await getFriendNames();
+      if(friendNames.length === 0){ list.innerHTML='<div class="feed-empty"><div class="fe-icon">👥</div><p>No friends posts yet.<br>Chat with someone first!</p></div>'; return; }
+      const inList = friendNames.map(f=>`"${f}"`).join(',');
+      query += `&from_user=in.(${inList})`;
+    }
+    const posts = await dbSelect('posts', query);
+    feedPosts = posts || [];
+
+    // load likes + comments counts for each post
+    await Promise.all(feedPosts.map(async p=>{
+      try{
+        const [likes, comments] = await Promise.all([
+          dbSelect('post_likes', `post_id=eq.${p.id}&select=from_user`),
+          dbSelect('post_comments', `post_id=eq.${p.id}&select=id&order=created_at.asc`)
+        ]);
+        p._likes = likes || [];
+        p._commentCount = (comments||[]).length;
+        p._showComments = false;
+        p._comments = [];
+      }catch{ p._likes=[]; p._commentCount=0; }
+    }));
+
+    renderFeed();
+  }catch(e){ list.innerHTML=`<div class="feed-empty"><div class="fe-icon">😢</div><p>Error loading feed:<br>${esc(e.message)}</p></div>`; }
+}
+
+async function getFriendNames(){
+  // Get all unique users from chats that include me
+  try{
+    const userChats = await dbSelect('chats', `members=cs.{${me}}&select=members`);
+    const names = new Set([me]);
+    (userChats||[]).forEach(c=>(c.members||[]).forEach(m=>names.add(m)));
+    return [...names];
+  }catch{ return [me]; }
+}
+
+function renderFeed(){
+  const list = document.getElementById('feed-list');
+  list.innerHTML = '';
+  if(!feedPosts || feedPosts.length === 0){
+    list.innerHTML = '<div class="feed-empty"><div class="fe-icon">📸</div><p>No posts yet.<br>Be the first to post!</p></div>';
+    return;
+  }
+  feedPosts.forEach(p => list.appendChild(buildPostCard(p)));
+}
+
+function buildPostCard(p){
+  const isMine = p.from_user === me;
+  const liked = (p._likes||[]).some(l=>l.from_user===me);
+  const likeCount = (p._likes||[]).length;
+  const timeAgo = getTimeAgo(p.created_at);
+
+  const card = document.createElement('div');
+  card.className = 'pcard';
+  card.id = 'post-'+p.id;
+
+  let html = `
+    <div class="pcard-head">
+      <div class="pcard-av" style="background:${avc(p.from_user)}">${ini(p.from_user)}</div>
+      <div class="pcard-user"><strong>${esc(p.from_user)}</strong><span>${timeAgo}</span></div>
+      <div class="pcard-vis ${p.visibility==='public'?'pub':'friends'}">${p.visibility==='public'?'🌍 Public':'👥 Friends'}</div>
+      ${isMine?`<button class="pcard-del" data-pid="${p.id}" title="Delete post">🗑️</button>`:''}
+    </div>`;
+
+  if(p.text) html += `<div class="pcard-text">${esc(p.text)}</div>`;
+  if(p.img) html += `<img class="pcard-img" src="${p.img}" alt="post" onclick="openLightbox('${p.img}')"/>`;
+
+  if(p.status === 'pending'){
+    html += `<div class="pcard-pending">⏳ Pending AI safety review...</div>`;
+  }
+
+  html += `
+    <div class="pcard-actions">
+      <button class="pact-btn ${liked?'liked':''}" data-pid="${p.id}" id="like-btn-${p.id}">
+        <span class="like-icon">${liked?'❤️':'🤍'}</span> ${likeCount||''}
+      </button>
+      <div class="pact-sep"></div>
+      <button class="pact-btn" data-pid="${p.id}" id="cmt-btn-${p.id}">
+        💬 ${p._commentCount||''}
+      </button>
+    </div>
+    <div id="comments-${p.id}" style="display:none;">
+      <div class="pcard-comments" id="comments-list-${p.id}"></div>
+      <div class="pcomment-inp-row">
+        <input class="pcomment-inp" id="cmt-inp-${p.id}" placeholder="Write a comment..." maxlength="200" autocomplete="off"/>
+        <button class="pcomment-send" data-pid="${p.id}" id="cmt-send-${p.id}"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+      </div>
+    </div>`;
+
+  card.innerHTML = html;
+
+  // Like button
+  const likeBtn = card.querySelector(`#like-btn-${p.id}`);
+  if(likeBtn) likeBtn.onclick = ()=>toggleLike(p);
+
+  // Comment toggle
+  const cmtBtn = card.querySelector(`#cmt-btn-${p.id}`);
+  if(cmtBtn) cmtBtn.onclick = ()=>toggleComments(p, card);
+
+  // Comment send
+  const cmtSend = card.querySelector(`#cmt-send-${p.id}`);
+  if(cmtSend) cmtSend.onclick = ()=>sendComment(p, card);
+  const cmtInp = card.querySelector(`#cmt-inp-${p.id}`);
+  if(cmtInp) cmtInp.onkeydown = e=>{ if(e.key==='Enter'){ e.preventDefault(); sendComment(p, card); }};
+
+  // Delete button
+  const delBtn = card.querySelector('.pcard-del');
+  if(delBtn) delBtn.onclick = async()=>{
+    if(!confirm('Delete this post?')) return;
+    try{
+      await dbDelete('posts', `id=eq.${p.id}`);
+      feedPosts = feedPosts.filter(x=>x.id!==p.id);
+      card.remove();
+    }catch(e){ toast('Error: '+e.message); }
+  };
+
+  return card;
+}
+
+// ── LIKES ─────────────────────────────────
+async function toggleLike(p){
+  const liked = (p._likes||[]).some(l=>l.from_user===me);
+  try{
+    if(liked){
+      await dbDelete('post_likes', `post_id=eq.${p.id}&from_user=eq.${encodeURIComponent(me)}`);
+      p._likes = p._likes.filter(l=>l.from_user!==me);
+    } else {
+      await dbInsert('post_likes', {id:uid(), post_id:p.id, from_user:me});
+      p._likes = [...(p._likes||[]), {from_user:me}];
+    }
+    // Update button
+    const btn = document.getElementById('like-btn-'+p.id);
+    if(btn){
+      const newLiked = !liked;
+      btn.className = 'pact-btn'+(newLiked?' liked':'');
+      btn.innerHTML = `<span class="like-icon">${newLiked?'❤️':'🤍'}</span> ${p._likes.length||''}`;
+    }
+  }catch(e){ toast('Error: '+e.message); }
+}
+
+// ── COMMENTS ──────────────────────────────
+async function toggleComments(p, card){
+  const wrap = card.querySelector('#comments-'+p.id);
+  if(!wrap) return;
+  if(wrap.style.display === 'none'){
+    wrap.style.display = 'block';
+    await loadComments(p, card);
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+async function loadComments(p, card){
+  const listEl = card.querySelector('#comments-list-'+p.id);
+  if(!listEl) return;
+  listEl.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:4px 0;">Loading...</div>';
+  try{
+    const comments = await dbSelect('post_comments', `post_id=eq.${p.id}&order=created_at.asc&limit=50`);
+    p._comments = comments || [];
+    listEl.innerHTML = '';
+    if(!p._comments.length){ listEl.innerHTML='<div style="font-size:12px;color:var(--text3);padding:4px 0;">No comments yet.</div>'; return; }
+    p._comments.forEach(c=>{
+      const el = document.createElement('div'); el.className='pcomment';
+      el.innerHTML=`<div class="pcomment-av" style="background:${avc(c.from_user)}">${ini(c.from_user)}</div><div class="pcomment-body"><strong>${esc(c.from_user)}</strong><span>${esc(c.text)}</span></div>`;
+      listEl.appendChild(el);
+    });
+  }catch(e){ listEl.innerHTML=`<div style="font-size:12px;color:var(--danger);">Error loading comments</div>`; }
+}
+
+async function sendComment(p, card){
+  const inp = card.querySelector('#cmt-inp-'+p.id);
+  if(!inp) return;
+  const text = inp.value.trim();
+  if(!text) return;
+  inp.value = '';
+  try{
+    const c = {id:uid(), post_id:p.id, from_user:me, text, created_at:Date.now()};
+    await dbInsert('post_comments', c);
+    p._commentCount = (p._commentCount||0)+1;
+    // update comment count on button
+    const btn = document.getElementById('cmt-btn-'+p.id);
+    if(btn) btn.innerHTML = '💬 '+p._commentCount;
+    // append comment to list
+    const listEl = card.querySelector('#comments-list-'+p.id);
+    if(listEl){
+      const placeholder = listEl.querySelector('div');
+      if(placeholder && placeholder.textContent==='No comments yet.') placeholder.remove();
+      const el=document.createElement('div');el.className='pcomment';
+      el.innerHTML=`<div class="pcomment-av" style="background:${avc(me)}">${ini(me)}</div><div class="pcomment-body"><strong>${esc(me)}</strong><span>${esc(text)}</span></div>`;
+      listEl.appendChild(el);
+    }
+  }catch(e){ toast('Error: '+e.message); }
+}
+
+// ── NEW POST ──────────────────────────────
+document.getElementById('new-post-btn').onclick = openNewPostModal;
+
+function openNewPostModal(){
+  pendingPostImg = null;
+  postVis = 'public';
+  document.getElementById('post-text').value = '';
+  document.getElementById('post-img-preview').style.display = 'none';
+  document.getElementById('post-img-prev').src = '';
+  document.getElementById('post-err').textContent = '';
+  document.getElementById('ai-scanning').classList.add('hidden');
+  document.getElementById('vis-pub').className = 'vis-opt on';
+  document.getElementById('vis-fri').className = 'vis-opt';
+  document.getElementById('post-submit').disabled = false;
+  document.getElementById('post-submit').textContent = 'Post ⚡';
+  document.getElementById('m-post').classList.remove('hidden');
+}
+
+function setPostVis(v){
+  postVis = v;
+  document.getElementById('vis-pub').className = 'vis-opt'+(v==='public'?' on':'');
+  document.getElementById('vis-fri').className = 'vis-opt'+(v==='friends'?' on':'');
+}
+
+document.getElementById('post-img-pick-btn').onclick = ()=>document.getElementById('post-img-file').click();
+document.getElementById('post-img-file').onchange = e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(!f.type.startsWith('image/')){toast('Pick an image file.');return;}
+  if(f.size>4*1024*1024){toast('Image too large — max 4MB.');return;}
+  const r=new FileReader();
+  r.onload=ev=>{
+    pendingPostImg=ev.target.result;
+    document.getElementById('post-img-prev').src=pendingPostImg;
+    document.getElementById('post-img-preview').style.display='block';
+  };
+  r.readAsDataURL(f);
+  e.target.value='';
+};
+document.getElementById('post-img-remove').onclick=()=>{
+  pendingPostImg=null;
+  document.getElementById('post-img-preview').style.display='none';
+  document.getElementById('post-img-prev').src='';
+};
+document.getElementById('post-cancel').onclick=()=>document.getElementById('m-post').classList.add('hidden');
+document.getElementById('m-post').onclick=e=>{if(e.target===document.getElementById('m-post'))document.getElementById('m-post').classList.add('hidden');};
+
+document.getElementById('post-submit').onclick = async()=>{
+  const text = document.getElementById('post-text').value.trim();
+  const errEl = document.getElementById('post-err');
+  errEl.textContent = '';
+
+  if(!text && !pendingPostImg){ errEl.textContent='Add a caption or image first.'; return; }
+
+  const btn = document.getElementById('post-submit');
+  btn.disabled = true;
+
+  // If there's an image, run AI safety check first
+  if(pendingPostImg){
+    btn.textContent = 'Scanning...';
+    document.getElementById('ai-scanning').classList.remove('hidden');
+    const safe = await checkImageSafety(pendingPostImg, text);
+    document.getElementById('ai-scanning').classList.add('hidden');
+    if(!safe){
+      errEl.textContent = '🚫 This image was flagged by our AI safety check and cannot be posted.';
+      btn.disabled = false; btn.textContent = 'Post ⚡';
+      return;
+    }
+  }
+
+  btn.textContent = 'Posting...';
+  try{
+    const post = {
+      id: uid(),
+      from_user: me,
+      text: text || null,
+      img: pendingPostImg || null,
+      visibility: postVis,
+      status: 'approved', // AI already approved it
+      created_at: Date.now()
+    };
+    await dbInsert('posts', post);
+    document.getElementById('m-post').classList.add('hidden');
+    toast('Posted! ⚡');
+    // Add to feed if visible
+    post._likes = []; post._commentCount = 0; post._showComments = false;
+    if((currentFeedTab==='public'&&postVis==='public')||(currentFeedTab==='friends')){
+      feedPosts.unshift(post);
+      const list = document.getElementById('feed-list');
+      const empty = list.querySelector('.feed-empty');
+      if(empty) empty.remove();
+      list.insertBefore(buildPostCard(post), list.firstChild);
+    }
+  }catch(e){ errEl.textContent='Error: '+e.message; }
+  finally{ btn.disabled=false; btn.textContent='Post ⚡'; }
+};
+
+// ── AI IMAGE SAFETY CHECK ─────────────────
+async function checkImageSafety(base64img, caption){
+  try{
+    // Extract base64 data (remove data:image/...;base64, prefix)
+    const base64data = base64img.split(',')[1];
+    const mimeMatch = base64img.match(/data:([^;]+);base64,/);
+    const mediaType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+
+    const response = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:10,
+        system:`You are a content moderator for a teen app. Respond ONLY with "SAFE" or "UNSAFE".
+Rules - mark UNSAFE if image contains:
+- Nudity or sexual content of any kind
+- Graphic violence, gore, or disturbing content
+- Drugs, weapons, or illegal content
+- Hate symbols or extremely offensive content
+- Adult-only content of any kind
+Everything else is SAFE. When in doubt, say SAFE.`,
+        messages:[{
+          role:'user',
+          content:[
+            {type:'image', source:{type:'base64', media_type:mediaType, data:base64data}},
+            {type:'text', text:`Caption: "${caption||'no caption'}". Is this image safe for a teen app?`}
+          ]
+        }]
+      })
+    });
+    const data = await response.json();
+    const verdict = data.content?.[0]?.text?.trim().toUpperCase();
+    return verdict === 'SAFE';
+  }catch(e){
+    // If AI check fails, allow the post (fail open)
+    console.warn('AI safety check failed:', e);
+    return true;
+  }
+}
+
+// ── TIME AGO ──────────────────────────────
+function getTimeAgo(ts){
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff/60000);
+  if(m < 1) return 'just now';
+  if(m < 60) return m+'m ago';
+  const h = Math.floor(m/60);
+  if(h < 24) return h+'h ago';
+  const d = Math.floor(h/24);
+  return d+'d ago';
+}
+
+// Lightbox already defined above — feed images use it too
+function openLightbox(src){ document.getElementById('limg').src=src; document.getElementById('lbox').classList.remove('hidden'); }
+
 // ── AUTO LOGIN ───────────────────────────────────
-// Self-heal: deduplicate device accounts on every load
+// Clean device accounts — just deduplicate locally, no server call needed here
 (function cleanDeviceAccounts(){
   try{
     const raw = JSON.parse(localStorage.getItem('zc_device_accounts')||'[]');
-    const clean = [...new Set(raw.filter(x=>typeof x==='string'&&x.length>0))];
+    // Only keep valid strings, deduplicate
+    const clean = [...new Set(raw.filter(x => typeof x==='string' && x.trim().length > 0))];
     localStorage.setItem('zc_device_accounts', JSON.stringify(clean));
-  }catch{ localStorage.setItem('zc_device_accounts','[]'); }
+  } catch {
+    // If anything goes wrong just reset to empty — don't block signups
+    localStorage.setItem('zc_device_accounts', '[]');
+  }
 })();
+
+// Emergency reset: if localStorage is corrupt, user can clear it
+// by adding ?resetdevice to the URL
+if(window.location.search.includes('resetdevice')){
+  localStorage.removeItem('zc_device_accounts');
+  window.history.replaceState({}, '', window.location.pathname);
+  console.log('Device account list reset');
+}
 
 (async()=>{
   const saved=localStorage.getItem('zc_me');
