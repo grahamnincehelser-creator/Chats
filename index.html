@@ -283,6 +283,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .strength-fill{height:100%;border-radius:99px;transition:width .3s,background .3s;}
 .strength-label{font-size:10px;margin-top:4px;font-weight:600;}
 .acct-btn{width:34px;height:34px;border-radius:50%;border:none;background:var(--surface2);color:var(--text2);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;margin-left:auto;flex-shrink:0;}
+@media(max-width:700px){.acct-btn{width:40px;height:40px;font-size:18px;}}
 .acct-btn:hover{background:var(--surface3);color:var(--text);}
 
 /* ══ MOBILE OVERHAUL ══ */
@@ -304,7 +305,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
   /* Sidebar on mobile */
   .sb-top{ padding:max(14px, env(safe-area-inset-top, 14px)) 14px 12px; }
-  .me-row{ padding:8px 10px; }
+  .me-row{ padding:12px 14px; gap:12px; }
+  .me-av{ width:48px !important; height:48px !important; font-size:16px !important; }
+  .me-info strong{ font-size:16px; }
+  .me-info small{ font-size:12px; }
+  .sb-logo-text{ font-size:24px; }
   .sb-label{ padding:12px 14px 4px; font-size:9px; }
   .clist{ padding:4px 8px 8px; }
   .ci{ padding:9px 10px; border-radius:12px; }
@@ -589,8 +594,17 @@ input, textarea, select {
   .bnav-btn span{font-size:10px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;}
   .bnav-btn.on{color:var(--p);}
   #s-app{flex-direction:column;}
-  .sb{display:none;}
-  .sb.mobile-open{display:flex;position:fixed;inset:0;z-index:20;}
+  /* Sidebar fills full screen on mobile, slides in/out */
+  .sb{
+    position:fixed;inset:0;z-index:20;
+    transform:translateX(0);
+    transition:transform .28s cubic-bezier(.4,0,.2,1);
+    display:flex !important;
+    width:100% !important;
+  }
+  .sb.out{transform:translateX(-100%);}
+  /* chat main and feed take full screen */
+  .cmain{ width:100%; }
   /* Mobile feed tweaks */
   .feed-hdr{padding:12px 14px;}
   .feed-hdr h2{font-size:17px;}
@@ -764,7 +778,7 @@ input, textarea, select {
   <div class="bnav" id="bnav">
     <button class="bnav-btn on" id="bn-chat" onclick="switchMainTab('chat')">💬<span>Chats</span></button>
     <button class="bnav-btn" id="bn-feed" onclick="switchMainTab('feed')">📸<span>Feed</span></button>
-    <button class="bnav-btn" id="bn-me" onclick="document.getElementById('acct-btn').click()">⚙️<span>Account</span></button>
+    <button class="bnav-btn" id="bn-me" onclick="switchMainTab('chat');setTimeout(()=>G('acct-btn').click(),100)">⚙️<span>Account</span></button>
   </div>
 
 </div>
@@ -1103,6 +1117,12 @@ if(_deviceLocked){
   return;
 }
 G('s-auth').classList.add('hidden');G('s-app').classList.remove('hidden');
+// On mobile, make sure sidebar is visible (not slid out) when entering app
+if(window.innerWidth<=700){
+  G('sb').classList.remove('out');
+  G('achat').style.display='none';
+  G('nochat').style.display='flex';
+}
   G('me-name').textContent=me;
   // load profile img for self
   await refreshMyAvatar();
@@ -1114,8 +1134,14 @@ async function refreshMyAvatar(){
   delete profileCache[me];
   const img=await getProfileImg(me);
   const av=G('me-av');
-  if(img){av.style.background='none';av.style.overflow='hidden';av.style.padding='0';av.innerHTML=`<img src="${img}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt=""/>`;}
-  else{av.innerHTML='';av.style.background=avc(me);av.textContent=ini(me);}
+  if(!av)return;
+  if(img){
+    av.style.background='none';av.style.overflow='hidden';av.style.padding='0';
+    av.innerHTML=`<img src="${img}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" alt=""/>`;
+  } else {
+    av.innerHTML='';av.style.background=avc(me);av.style.overflow='';av.style.padding='';
+    av.textContent=ini(me);
+  }
 }
 
 // ── CHATS ─────────────────────────────────────────
@@ -1412,7 +1438,14 @@ G('info-cl').onclick=()=>G('m-info').classList.add('hidden');
 G('m-info').onclick=e=>{if(e.target===G('m-info'))G('m-info').classList.add('hidden');};
 G('info-del').onclick=()=>{if(confirm('Leave this chat?')){G('m-info').classList.add('hidden');leaveChat(activeId);}};
 
-G('hdr-back').onclick=()=>{G('sb').classList.remove('out');activeId=null;G('achat').style.display='none';G('nochat').style.display='flex';renderChats();if(wsMsgs)try{wsMsgs.close();}catch{}};
+G('hdr-back').onclick=()=>{
+  activeId=null;
+  G('achat').style.display='none';
+  G('nochat').style.display='flex';
+  G('sb').classList.remove('out'); // slide sidebar back in
+  renderChats();
+  if(wsMsgs)try{wsMsgs.close();}catch{}
+};
 G('out-btn').onclick=()=>{
   if(!confirm('Sign out?'))return;
   me='';myChats=[];activeId=null;localStorage.removeItem('zc_me');
@@ -1433,13 +1466,21 @@ function switchMainTab(tab){
     if(cm)cm.style.display='none';if(fs){fs.classList.remove('hidden');fs.style.display='flex';}
     if(sbc)sbc.className='feed-tab';if(sbf)sbf.className='feed-tab on';
     if(bnc)bnc.className='bnav-btn';if(bnf)bnf.className='bnav-btn on';
-    if(window.innerWidth<=700)G('sb').classList.add('out');
+    if(window.innerWidth<=700){
+      G('sb').classList.add('out');
+    }
     loadFeed();
   } else {
     if(cm)cm.style.display='';if(fs){fs.classList.add('hidden');fs.style.display='';}
     if(sbc)sbc.className='feed-tab on';if(sbf)sbf.className='feed-tab';
     if(bnc)bnc.className='bnav-btn on';if(bnf)bnf.className='bnav-btn';
-    if(window.innerWidth<=700){G('sb').classList.remove('out');G('achat').style.display='none';G('nochat').style.display='flex';}
+    if(window.innerWidth<=700){
+      // Show sidebar (chat list) on mobile
+      G('sb').classList.remove('out');
+      G('achat').style.display='none';
+      G('nochat').style.display='flex';
+      activeId=null;
+    }
   }
 }
 
