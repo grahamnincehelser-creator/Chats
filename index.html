@@ -643,30 +643,7 @@ input, textarea, select {
 .search-clear:hover{color:var(--text);}
 
 /* search results dropdown */
-.search-results{
-  position:absolute;top:100%;left:0;right:0;z-index:50;
-  background:var(--surface);border:1px solid var(--border2);
-  border-radius:0 0 16px 16px;
-  max-height:280px;overflow-y:auto;
-  box-shadow:0 8px 24px rgba(0,0,0,.4);
-}
 .search-wrap{position:relative;}
-.sresult{
-  display:flex;align-items:center;gap:10px;
-  padding:11px 14px;cursor:pointer;transition:background .15s;
-  border-bottom:1px solid var(--border);
-}
-.sresult:last-child{border-bottom:none;}
-.sresult:hover{background:var(--surface2);}
-.sresult-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
-.sresult-info strong{display:block;font-size:14px;font-weight:600;}
-.sresult-info span{font-size:12px;color:var(--text3);}
-.sresult-action{margin-left:auto;padding:5px 12px;border-radius:8px;border:1px solid var(--border2);background:none;color:var(--p);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;flex-shrink:0;}
-.sresult-action:hover{background:rgba(167,139,250,.1);border-color:var(--p);}
-.sresult-action.feed-action{color:var(--cy);border-color:rgba(34,211,238,.2);}
-.sresult-action.feed-action:hover{background:rgba(34,211,238,.08);}
-.search-empty{padding:16px;text-align:center;font-size:13px;color:var(--text3);}
-.search-loading{padding:14px;text-align:center;font-size:13px;color:var(--text3);}
 
 
 </style>
@@ -714,14 +691,6 @@ input, textarea, select {
         <div class="online"></div>
         <button class="acct-btn" id="acct-btn" title="Account settings">⚙️</button>
       </div>
-    </div>
-    <!-- CHAT SEARCH -->
-    <div class="search-bar">
-      <div class="search-wrap" style="flex:1;position:relative;">
-        <input class="search-inp" id="chat-search-inp" placeholder="🔍 Search users to chat..." autocomplete="off" autocorrect="off" spellcheck="false"/>
-        <div class="search-results hidden" id="chat-search-results"></div>
-      </div>
-      <button class="search-clear hidden" id="chat-search-clear">×</button>
     </div>
     <div style="display:flex;gap:6px;padding:12px 14px 0;">
       <button class="feed-tab on" id="sb-tab-chat" onclick="switchMainTab('chat')">💬 Chats</button>
@@ -782,11 +751,9 @@ input, textarea, select {
     </div>
     <!-- FEED USER SEARCH -->
     <div class="search-bar">
-      <div class="search-wrap" style="flex:1;position:relative;">
-        <input class="search-inp" id="feed-search-inp" placeholder="🔍 Search users..." autocomplete="off" autocorrect="off" spellcheck="false"/>
-        <div class="search-results hidden" id="feed-search-results"></div>
-      </div>
-      <button class="search-clear hidden" id="feed-search-clear">×</button>
+      <input class="search-inp" id="feed-search-inp" placeholder="🔍 Search by username..." autocomplete="off" autocorrect="off" spellcheck="false" style="flex:1;"/>
+      <button id="feed-search-btn" style="padding:9px 16px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--p2),var(--pk));color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0;">Search</button>
+      <button id="feed-search-clear" style="display:none;padding:9px 14px;border-radius:12px;border:1px solid var(--border2);background:none;color:var(--text3);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;cursor:pointer;flex-shrink:0;">✕ Clear</button>
     </div>
     <div class="feed-list" id="feed-list">
       <div class="feed-empty"><div class="fe-icon">📸</div><p>No posts yet.<br>Be the first to post!</p></div>
@@ -1893,86 +1860,28 @@ G('pc-change-pin').onclick=()=>{
 
 
 // ── USER SEARCH ──────────────────────────────────
-let chatSearchTimer=null, feedSearchTimer=null;
+let feedSearchTimer=null;
 let allUsers=[]; // cached full user list
 let usersLoaded=false;
 
 async function loadAllUsers(){
   if(usersLoaded) return;
   try{
-    const rows = await dbGet('users','select=username&order=username.asc');
+    const rows = await dbGet('users','select=username,profile_img&order=username.asc');
     allUsers = (rows||[]).filter(u=>u.username!==me);
     usersLoaded = true;
   }catch(e){ allUsers=[]; }
 }
 
-function filterUsers(query){
-  const q = query.toLowerCase().trim();
-  if(!q) return allUsers.slice(0,20);
-  return allUsers.filter(u=>u.username.toLowerCase().includes(q)).slice(0,20);
-}
 
-function buildUserResult(u, actionLabel, actionClass, onAction){
-  const d = document.createElement('div');
-  d.className = 'sresult';
-  // No profile images shown in search — just username initial avatar
-  const avHtml = `<div class="sresult-av" style="background:${avc(u.username)}">${ini(u.username)}</div>`;
-  d.innerHTML = `${avHtml}<div class="sresult-info"><strong>${esc(u.username)}</strong><span>ZapChat user</span></div><button class="sresult-action ${actionClass}">${actionLabel}</button>`;
-  d.querySelector('.sresult-action').onclick = e => { e.stopPropagation(); onAction(u); };
-  return d;
-}
 
-function showSearchResults(resultsEl, users, actionLabel, actionClass, onAction){
-  resultsEl.innerHTML='';
-  resultsEl.classList.remove('hidden');
-  if(!users.length){
-    resultsEl.innerHTML='<div class="search-empty">No users found</div>';
-    return;
-  }
-  users.forEach(u => resultsEl.appendChild(buildUserResult(u, actionLabel, actionClass, onAction)));
-}
 
-// ── CHAT SEARCH ───────────────────────────────────
-const chatInp = G('chat-search-inp');
-const chatResults = G('chat-search-results');
-const chatClear = G('chat-search-clear');
 
-chatInp.onfocus = async () => {
-  await loadAllUsers();
-  if(!chatInp.value.trim()){
-    showSearchResults(chatResults, allUsers.slice(0,20), '💬 Message', '', u => {
-      chatInp.value='';chatResults.classList.add('hidden');chatClear.classList.add('hidden');
-      startChatWith(u.username);
-    });
-  }
-};
 
-chatInp.oninput = () => {
-  const v = chatInp.value.trim();
-  chatClear.classList.toggle('hidden', !v);
-  clearTimeout(chatSearchTimer);
-  chatSearchTimer = setTimeout(async()=>{
-    await loadAllUsers();
-    const users = filterUsers(v);
-    showSearchResults(chatResults, users, '💬 Message', '', u => {
-      chatInp.value='';chatResults.classList.add('hidden');chatClear.classList.add('hidden');
-      startChatWith(u.username);
-    });
-  }, 200);
-};
 
-chatClear.onclick = () => {
-  chatInp.value='';chatResults.classList.add('hidden');chatClear.classList.add('hidden');chatInp.focus();
-};
+// chat search removed
 
-document.addEventListener('click', e => {
-  if(!G('chat-search-inp').contains(e.target) && !G('chat-search-results').contains(e.target)){
-    G('chat-search-results').classList.add('hidden');
-  }
-  if(!G('feed-search-inp').contains(e.target) && !G('feed-search-results').contains(e.target)){
-    G('feed-search-results').classList.add('hidden');
-  }
-});
+// search handlers simplified
 
 async function startChatWith(username){
   // check if DM already exists
@@ -1989,37 +1898,19 @@ async function startChatWith(username){
 }
 
 // ── FEED SEARCH ───────────────────────────────────
-const feedInp = G('feed-search-inp');
-const feedResults = G('feed-search-results');
-const feedClear = G('feed-search-clear');
-
-feedInp.onfocus = async () => {
-  await loadAllUsers();
-  if(!feedInp.value.trim()){
-    showSearchResults(feedResults, allUsers.slice(0,20), '👤 View Posts', 'feed-action', u => {
-      feedInp.value=u.username;feedResults.classList.add('hidden');
-      viewUserPosts(u.username);
-    });
-  }
+G('feed-search-btn').onclick = async () => {
+  const v = G('feed-search-inp').value.trim();
+  if(!v){ toast('Enter a username to search.'); return; }
+  await viewUserPosts(v);
+  G('feed-search-clear').style.display = 'block';
 };
-
-feedInp.oninput = () => {
-  const v = feedInp.value.trim();
-  feedClear.classList.toggle('hidden', !v);
-  clearTimeout(feedSearchTimer);
-  feedSearchTimer = setTimeout(async()=>{
-    await loadAllUsers();
-    const users = filterUsers(v);
-    showSearchResults(feedResults, users, '👤 View Posts', 'feed-action', u => {
-      feedInp.value=u.username;feedResults.classList.add('hidden');
-      viewUserPosts(u.username);
-    });
-  }, 200);
+G('feed-search-inp').onkeydown = e => {
+  if(e.key==='Enter') G('feed-search-btn').click();
 };
-
-feedClear.onclick = () => {
-  feedInp.value='';feedResults.classList.add('hidden');feedClear.classList.add('hidden');
-  feedInp.focus();loadFeed();
+G('feed-search-clear').onclick = () => {
+  G('feed-search-inp').value = '';
+  G('feed-search-clear').style.display = 'none';
+  loadFeed();
 };
 
 async function viewUserPosts(username){
