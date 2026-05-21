@@ -602,6 +602,73 @@ input, textarea, select {
   .pcard-av{width:36px;height:36px;}
 }
 
+
+/* edit bar */
+.edit-bar{display:none;align-items:center;gap:8px;padding:6px 12px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:10px;margin-bottom:6px;font-size:12px;color:var(--p);}
+.edit-bar-text{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cancel-edit-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0 2px;}
+/* msg actions */
+.msg-trow{display:flex;align-items:center;gap:4px;}
+.msg-acts{display:flex;gap:2px;opacity:0;transition:opacity .15s;}
+.mrow:hover .msg-acts{opacity:1;}
+.mrow.me:hover .msg-acts{opacity:1;}
+.msg-act-btn{background:none;border:none;cursor:pointer;font-size:13px;padding:2px 4px;border-radius:6px;transition:background .15s;}
+.msg-act-btn:hover{background:var(--surface2);}
+/* deleted msg */
+.deleted-msg{color:var(--text3)!important;font-style:italic;background:var(--surface2)!important;}
+/* edited label */
+.msg-edited{font-size:10px;color:rgba(255,255,255,.5);margin-left:4px;}
+/* profile tab */
+.prof-img-preview{width:80px;height:80px;border-radius:50%;object-fit:cover;display:none;margin:0 auto 12px;border:2px solid var(--border2);}
+.prof-img-area{text-align:center;padding:10px 0;}
+/* video in feed */
+.post-vid-preview{display:none;position:relative;margin-bottom:12px;}
+.post-vid-preview video{width:100%;max-height:200px;border-radius:12px;display:block;}
+.post-vid-preview .remove-img{position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;border:none;background:var(--danger);color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;}
+
+/* ── USER SEARCH ── */
+.search-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;border-bottom:1px solid var(--border);
+  background:var(--surface);flex-shrink:0;
+}
+.search-inp{
+  flex:1;background:var(--surface2);border:1.5px solid var(--border2);
+  border-radius:12px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:14px;padding:9px 14px;outline:none;transition:border-color .2s;
+}
+.search-inp:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(167,139,250,.1);}
+.search-inp::placeholder{color:var(--text3);}
+.search-clear{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:0 2px;transition:color .15s;}
+.search-clear:hover{color:var(--text);}
+
+/* search results dropdown */
+.search-results{
+  position:absolute;top:100%;left:0;right:0;z-index:50;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:0 0 16px 16px;
+  max-height:280px;overflow-y:auto;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+}
+.search-wrap{position:relative;}
+.sresult{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 14px;cursor:pointer;transition:background .15s;
+  border-bottom:1px solid var(--border);
+}
+.sresult:last-child{border-bottom:none;}
+.sresult:hover{background:var(--surface2);}
+.sresult-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.sresult-info strong{display:block;font-size:14px;font-weight:600;}
+.sresult-info span{font-size:12px;color:var(--text3);}
+.sresult-action{margin-left:auto;padding:5px 12px;border-radius:8px;border:1px solid var(--border2);background:none;color:var(--p);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.sresult-action:hover{background:rgba(167,139,250,.1);border-color:var(--p);}
+.sresult-action.feed-action{color:var(--cy);border-color:rgba(34,211,238,.2);}
+.sresult-action.feed-action:hover{background:rgba(34,211,238,.08);}
+.search-empty{padding:16px;text-align:center;font-size:13px;color:var(--text3);}
+.search-loading{padding:14px;text-align:center;font-size:13px;color:var(--text3);}
+
+
 </style>
 </head>
 <body>
@@ -648,6 +715,14 @@ input, textarea, select {
         <button class="acct-btn" id="acct-btn" title="Account settings">⚙️</button>
       </div>
     </div>
+    <!-- CHAT SEARCH -->
+    <div class="search-bar">
+      <div class="search-wrap" style="flex:1;position:relative;">
+        <input class="search-inp" id="chat-search-inp" placeholder="🔍 Search users to chat..." autocomplete="off" autocorrect="off" spellcheck="false"/>
+        <div class="search-results hidden" id="chat-search-results"></div>
+      </div>
+      <button class="search-clear hidden" id="chat-search-clear">×</button>
+    </div>
     <div style="display:flex;gap:6px;padding:12px 14px 0;">
       <button class="feed-tab on" id="sb-tab-chat" onclick="switchMainTab('chat')">💬 Chats</button>
       <button class="feed-tab" id="sb-tab-feed" onclick="switchMainTab('feed')">📸 Feed</button>
@@ -674,6 +749,7 @@ input, textarea, select {
       <div class="msgs" id="msgs"></div>
       <div class="iarea">
         <div class="prevwrap" id="prevwrap"><img id="prev-img" src="" alt=""/><button class="prevx" id="prevx">×</button></div>
+        <div class="edit-bar" id="edit-bar"><span class="edit-bar-text" id="edit-bar-text"></span><button class="cancel-edit-btn" id="cancel-edit">×</button></div>
         <div class="emojis">
           <button class="emj" data-e="😂">😂</button><button class="emj" data-e="🔥">🔥</button>
           <button class="emj" data-e="💀">💀</button><button class="emj" data-e="❤️">❤️</button>
@@ -703,6 +779,14 @@ input, textarea, select {
         <button class="feed-tab" id="ft-friends">👥 Friends</button>
       </div>
       <button class="post-btn" id="new-post-btn" title="New post">＋</button>
+    </div>
+    <!-- FEED USER SEARCH -->
+    <div class="search-bar">
+      <div class="search-wrap" style="flex:1;position:relative;">
+        <input class="search-inp" id="feed-search-inp" placeholder="🔍 Search users..." autocomplete="off" autocorrect="off" spellcheck="false"/>
+        <div class="search-results hidden" id="feed-search-results"></div>
+      </div>
+      <button class="search-clear hidden" id="feed-search-clear">×</button>
     </div>
     <div class="feed-list" id="feed-list">
       <div class="feed-empty"><div class="fe-icon">📸</div><p>No posts yet.<br>Be the first to post!</p></div>
@@ -814,8 +898,9 @@ input, textarea, select {
     <h3>⚙️ Account Settings</h3>
     <p class="msub">Manage your ZapChat account.</p>
     <div class="acct-tabs">
-      <button class="acct-tab on" id="at-pw">Change Password</button>
-      <button class="acct-tab" id="at-del">Delete Account</button>
+      <button class="acct-tab on" id="at-pw">Password</button>
+      <button class="acct-tab" id="at-del">Delete</button>
+      <button class="acct-tab" id="at-prof">Profile Pic</button>
     </div>
 
     <!-- change password -->
@@ -831,6 +916,20 @@ input, textarea, select {
       <div class="mbtns">
         <button class="mbtn cl" id="pw-cancel">Cancel</button>
         <button class="mbtn ok" id="pw-save">Update Password</button>
+      </div>
+    </div>
+
+    <!-- profile pic -->
+    <div id="af-prof" style="display:none">
+      <div class="prof-img-area">
+        <img class="prof-img-preview" id="prof-preview" src="" alt="Profile"/>
+        <p style="font-size:13px;color:var(--text3);margin-bottom:14px;">Upload a photo to use as your profile picture across ZapChat.</p>
+        <button class="mbtn ok" id="prof-img-btn" style="margin-bottom:10px;">📷 Choose Photo</button>
+        <input type="file" id="prof-img-file" accept="image/*" style="display:none"/>
+      </div>
+      <div class="mbtns">
+        <button class="mbtn cancel" id="prof-remove-btn" style="color:var(--danger);">Remove Picture</button>
+        <button class="mbtn ok" id="prof-save-btn">Save Profile Picture</button>
       </div>
     </div>
 
@@ -870,6 +969,9 @@ input, textarea, select {
       <img id="post-img-prev" src="" alt=""/>
       <button class="remove-img" id="post-img-remove">×</button>
     </div>
+    <button class="mbtn ok" id="post-vid-pick-btn" style="width:100%;background:var(--surface2);color:var(--text2);box-shadow:none;border:1.5px solid var(--border2);margin-bottom:4px;">🎥 Add Video</button>
+    <input type="file" id="post-vid-file" accept="video/*" style="display:none"/>
+    <div class="post-vid-preview" id="post-vid-preview"><video id="post-vid-prev" controls></video><button class="remove-img" id="post-vid-remove">×</button></div>
     <button class="mbtn ok" id="post-img-pick-btn" style="width:100%;background:var(--surface2);color:var(--text2);box-shadow:none;border:1.5px solid var(--border2);margin-bottom:4px;">🖼️ Add Image</button>
     <input type="file" id="post-img-file" accept="image/*" style="display:none"/>
     <div class="ai-scanning hidden" id="ai-scanning"><span class="spin" style="border-top-color:var(--cy);border-color:rgba(34,211,238,.2);"></span> AI is scanning image for safety...</div>
@@ -923,41 +1025,23 @@ input, textarea, select {
 <div class="toast hidden" id="toast"></div>
 
 <script>
-const SB_URL = 'https://xszbtiivlsvbahmcimwl.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzemJ0aWl2bHN2YmFobWNpbXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxODAzNjEsImV4cCI6MjA5Mzc1NjM2MX0.deB80cZ9s_TDxZlGSF83eaIN1c6v60Zbwifx2GeEgRY';
+const SB_URL='https://xszbtiivlsvbahmcimwl.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzemJ0aWl2bHN2YmFobWNpbXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxODAzNjEsImV4cCI6MjA5Mzc1NjM2MX0.deB80cZ9s_TDxZlGSF83eaIN1c6v60Zbwifx2GeEgRY';
 
-// ── SUPABASE REST ────────────────────────────────
-const H = () => ({'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=representation'});
-async function dbGet(table, q=''){
-  const r = await fetch(`${SB_URL}/rest/v1/${table}?${q}`, {headers:H()});
-  if(!r.ok) throw new Error(await r.text());
-  return r.json();
-}
-async function dbPost(table, body){
-  const r = await fetch(`${SB_URL}/rest/v1/${table}`, {method:'POST', headers:H(), body:JSON.stringify(body)});
-  if(!r.ok) throw new Error(await r.text());
-  return r.json();
-}
-async function dbPatch(table, q, body){
-  const r = await fetch(`${SB_URL}/rest/v1/${table}?${q}`, {method:'PATCH', headers:H(), body:JSON.stringify(body)});
-  if(!r.ok) throw new Error(await r.text());
-  return r.json();
-}
-async function dbDel(table, q){
-  const r = await fetch(`${SB_URL}/rest/v1/${table}?${q}`, {method:'DELETE', headers:H()});
-  if(!r.ok) throw new Error(await r.text());
-}
+// ── SUPABASE ─────────────────────────────────────
+const H=()=>({'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=representation'});
+async function dbGet(t,q=''){const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{headers:H()});if(!r.ok)throw new Error(await r.text());return r.json();}
+async function dbPost(t,b){const r=await fetch(`${SB_URL}/rest/v1/${t}`,{method:'POST',headers:H(),body:JSON.stringify(b)});if(!r.ok)throw new Error(await r.text());return r.json();}
+async function dbPatch(t,q,b){const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{method:'PATCH',headers:H(),body:JSON.stringify(b)});if(!r.ok)throw new Error(await r.text());return r.json();}
+async function dbDel(t,q){const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{method:'DELETE',headers:H()});if(!r.ok)throw new Error(await r.text());}
 
-// ── REALTIME ─────────────────────────────────────
-function rtSub(table, filter, cb){
-  const ws = new WebSocket(SB_URL.replace('https','wss')+'/realtime/v1/websocket?apikey='+SB_KEY+'&vsn=1.0.0');
-  ws.onopen = () => {
+function rtSub(table,filter,cb){
+  const ws=new WebSocket(SB_URL.replace('https','wss')+'/realtime/v1/websocket?apikey='+SB_KEY+'&vsn=1.0.0');
+  ws.onopen=()=>{
     ws.send(JSON.stringify({topic:'realtime:public',event:'phx_join',payload:{},ref:'1'}));
-    ws.send(JSON.stringify({topic:`realtime:public:${table}`,event:'phx_join',payload:{config:{broadcast:{self:false},postgres_changes:[{event:'INSERT',schema:'public',table,filter:filter||''}]}},ref:'2'}));
+    ws.send(JSON.stringify({topic:`realtime:public:${table}`,event:'phx_join',payload:{config:{broadcast:{self:false},postgres_changes:[{event:'*',schema:'public',table,filter:filter||''}]}},ref:'2'}));
   };
-  ws.onmessage = e => {
-    try { const m=JSON.parse(e.data); if(m.event==='postgres_changes'&&m.payload?.data?.record) cb(m.payload.data.record); } catch{}
-  };
+  ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.event==='postgres_changes'&&m.payload?.data)cb(m.payload.data);}catch{}};
   return ws;
 }
 
@@ -975,12 +1059,31 @@ function timeAgo(ts){const d=Date.now()-ts,m=Math.floor(d/60000);if(m<1)return'j
 let toastTid;
 function toast(msg,ms=2800){const t=G('toast');if(!t)return;t.textContent=msg;t.classList.remove('hidden');clearTimeout(toastTid);toastTid=setTimeout(()=>t.classList.add('hidden'),ms);}
 async function sha256(str){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+// profile image cache
+const profileCache={};
+async function getProfileImg(username){
+  if(profileCache[username]!==undefined)return profileCache[username];
+  try{const r=await dbGet('users',`username=eq.${encodeURIComponent(username)}&select=profile_img`);profileCache[username]=r?.[0]?.profile_img||null;}catch{profileCache[username]=null;}
+  return profileCache[username];
+}
+function makeAvEl(username,size=32,extraClass=''){
+  const d=document.createElement('div');
+  d.className=`av ${extraClass}`;d.style.width=size+'px';d.style.height=size+'px';d.style.fontSize=Math.floor(size*0.38)+'px';
+  const img=profileCache[username];
+  if(img){d.style.background='none';d.style.padding='0';d.style.overflow='hidden';d.innerHTML=`<img src="${img}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt=""/>`;}
+  else{d.style.background=avc(username);d.textContent=ini(username);}
+  return d;
+}
 
 // ── STATE ─────────────────────────────────────────
-let me='', myChats=[], activeId=null, wsMsgs=null, wsChats=null;
-let mainTab='chat', feedTab='public', feedPosts=[], postVis='public', pendPostImg=null, wsFeed=null;
-let _sessionPin='1234', _sessionLocked=false, _masterPw='parent123';
+let me='',myChats=[],activeId=null,wsMsgs=null,wsChats=null;
+let mainTab='chat',feedTab='public',feedPosts=[],postVis='public',pendPostImg=null,pendPostVid=null;
+// Parental controls are DEVICE-WIDE — persist across all accounts on this device
+let _masterPw = localStorage.getItem('zc_master_pw')||'parent123';
+let _devicePin = localStorage.getItem('zc_device_pin')||'1234';
+let _deviceLocked = localStorage.getItem('zc_device_locked')==='1';
 let pendImg=null;
+let editingMsgId=null;
 
 // ── AUTH ──────────────────────────────────────────
 G('t-in').onclick=()=>swTab('in');
@@ -990,43 +1093,36 @@ function swTab(t){
   G('f-up').style.display=t==='up'?'block':'none';
   G('t-in').className='tab'+(t==='in'?' on':'');
   G('t-up').className='tab'+(t==='up'?' on':'');
-  G('in-err').textContent='';
-  G('up-err').textContent='';
+  G('in-err').textContent='';G('up-err').textContent='';
 }
-
-G('in-btn').onclick=doLogin;
-G('in-p').onkeydown=e=>{if(e.key==='Enter')doLogin();};
+G('in-btn').onclick=doLogin;G('in-p').onkeydown=e=>{if(e.key==='Enter')doLogin();};
 async function doLogin(){
-  const u=G('in-u').value.trim(), p=G('in-p').value;
+  const u=G('in-u').value.trim(),p=G('in-p').value;
   if(!u||!p){G('in-err').textContent='Fill in both fields.';return;}
   const btn=G('in-btn');btn.disabled=true;btn.innerHTML='<span class="spin"></span>Logging in...';
   G('in-err').textContent='';
   try{
     const h=await sha256(p);
     const rows=await dbGet('users',`username=eq.${encodeURIComponent(u)}&password_hash=eq.${encodeURIComponent(h)}&select=username`);
-    if(!rows||rows.length===0){G('in-err').textContent='Wrong username or password.';return;}
-    me=rows[0].username;
-    localStorage.setItem('zc_me',me);
-    enterApp();
+    if(!rows||!rows.length){G('in-err').textContent='Wrong username or password.';return;}
+    me=rows[0].username;localStorage.setItem('zc_me',me);enterApp();
   }catch(e){G('in-err').textContent='Error: '+e.message;}
   finally{btn.disabled=false;btn.innerHTML='Log in →';}
 }
-
-G('up-btn').onclick=doSignup;
-G('up-p2').onkeydown=e=>{if(e.key==='Enter')doSignup();};
+G('up-btn').onclick=doSignup;G('up-p2').onkeydown=e=>{if(e.key==='Enter')doSignup();};
 async function doSignup(){
-  const u=G('up-u').value.trim().replace(/\s+/g,'_'), p=G('up-p').value, p2=G('up-p2').value;
+  const u=G('up-u').value.trim().replace(/\s+/g,'_'),p=G('up-p').value,p2=G('up-p2').value;
   if(!u||!p||!p2){G('up-err').textContent='Fill in all fields.';return;}
-  if(u.length<2){G('up-err').textContent='Username must be at least 2 characters.';return;}
-  if(p.length<4){G('up-err').textContent='Password must be at least 4 characters.';return;}
+  if(u.length<2){G('up-err').textContent='Username min 2 characters.';return;}
+  if(p.length<4){G('up-err').textContent='Password min 4 characters.';return;}
   if(p!==p2){G('up-err').textContent='Passwords do not match.';return;}
   const btn=G('up-btn');btn.disabled=true;btn.innerHTML='<span class="spin"></span>Creating...';
   G('up-err').textContent='';
   try{
     const exists=await dbGet('users',`username=eq.${encodeURIComponent(u)}&select=username`);
-    if(exists&&exists.length>0){G('up-err').textContent='Username already taken.';return;}
+    if(exists&&exists.length){G('up-err').textContent='Username already taken.';return;}
     const h=await sha256(p);
-    await dbPost('users',{id:uid(),username:u,password_hash:h});
+    await dbPost('users',{id:uid(),username:u,password_hash:h,profile_img:null});
     me=u;localStorage.setItem('zc_me',me);enterApp();
   }catch(e){G('up-err').textContent='Error: '+e.message;}
   finally{btn.disabled=false;btn.innerHTML='Create account →';}
@@ -1034,13 +1130,25 @@ async function doSignup(){
 
 // ── ENTER APP ─────────────────────────────────────
 async function enterApp(){
-  G('s-auth').classList.add('hidden');
-  G('s-app').classList.remove('hidden');
-  G('me-av').textContent=ini(me); G('me-av').style.background=avc(me);
+  // Block entry if device is locked — kid can't bypass by making new account
+if(_deviceLocked){
+  G('locked-screen').classList.remove('hidden');
+  return;
+}
+G('s-auth').classList.add('hidden');G('s-app').classList.remove('hidden');
   G('me-name').textContent=me;
+  // load profile img for self
+  await refreshMyAvatar();
   G('me-row').onclick=()=>{navigator.clipboard?.writeText(me);toast('Username copied! 👍');};
-  await loadChats();
-  subChats();
+  await loadChats();subChats();
+}
+
+async function refreshMyAvatar(){
+  delete profileCache[me];
+  const img=await getProfileImg(me);
+  const av=G('me-av');
+  if(img){av.style.background='none';av.style.overflow='hidden';av.style.padding='0';av.innerHTML=`<img src="${img}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt=""/>`;}
+  else{av.innerHTML='';av.style.background=avc(me);av.textContent=ini(me);}
 }
 
 // ── CHATS ─────────────────────────────────────────
@@ -1048,11 +1156,10 @@ async function loadChats(){
   try{
     const rows=await dbGet('chats',`members=cs.{${me}}&order=created_at.desc`);
     myChats=rows||[];
+    // load last messages in parallel
     await Promise.all(myChats.map(async c=>{
-      try{
-        const m=await dbGet('messages',`chat_id=eq.${c.id}&order=ts.desc&limit=1`);
-        c._last=m?.[0]||null;
-      }catch{c._last=null;}
+      try{const m=await dbGet('messages',`chat_id=eq.${c.id}&deleted=eq.false&order=ts.desc&limit=1`);c._last=m?.[0]||null;}
+      catch{c._last=null;}
       c._unread=0;
     }));
     myChats.sort((a,b)=>(b._last?.ts||0)-(a._last?.ts||0));
@@ -1062,10 +1169,13 @@ async function loadChats(){
 
 function subChats(){
   if(wsChats)try{wsChats.close();}catch{}
-  wsChats=rtSub('chats','',async row=>{
-    if(row.members&&row.members.includes(me)&&!myChats.find(c=>c.id===row.id)){
-      row._last=null;row._unread=0;myChats.unshift(row);renderChats();
-      toast('New chat from '+row.members.filter(m2=>m2!==me).join(', '));
+  wsChats=rtSub('chats','',async data=>{
+    if(data.type==='INSERT'){
+      const row=data.record;
+      if(row.members&&row.members.includes(me)&&!myChats.find(c=>c.id===row.id)){
+        row._last=null;row._unread=0;myChats.unshift(row);renderChats();
+        toast('New chat from '+row.members.filter(m2=>m2!==me).join(', '));
+      }
     }
   });
 }
@@ -1078,36 +1188,55 @@ function renderChats(){
   if(!myChats.length){el.innerHTML='<div class="empty"><div class="empty-icon">💬</div><p>No chats yet.<br>Hit <strong>+ New Chat</strong>!</p></div>';return;}
   el.innerHTML='';
   [...myChats].sort((a,b)=>(b._last?.ts||0)-(a._last?.ts||0)).forEach(c=>{
-    const isG=c.type==='group', name=chatName(c), av=chatAv(c);
-    const prev=c._last?.img?'📷 Image':trunc(c._last?.text||'',28)||'Tap to chat';
-    const d=document.createElement('div');
-    d.className='ci'+(c.id===activeId?' on':'');
-    d.innerHTML=`<div class="av ci-av ${isG?'grp':''}" style="background:${avc(av)}">${isG?'👥':ini(av)}</div><div class="ci-info"><strong>${esc(name)}</strong><span>${esc(prev)}</span></div><div class="ci-meta">${c._last?.ts?`<div class="ci-t">${fmtT(c._last.ts)}</div>`:''} ${c._unread?`<div class="ci-u">${c._unread}</div>`:''}</div><button class="ci-x">×</button>`;
-    d.onclick=e=>{if(e.target.classList.contains('ci-x'))return;openChat(c.id);};
-    d.querySelector('.ci-x').onclick=e=>{e.stopPropagation();if(confirm('Leave this chat?'))leaveChat(c.id);};
+    const isG=c.type==='group',name=chatName(c),av=chatAv(c);
+    const prev=c._last?.deleted?'🗑 Message deleted':c._last?.img?'📷 Image':c._last?.video?'🎥 Video':trunc(c._last?.text||'',28)||'Tap to chat';
+    const d=document.createElement('div');d.className='ci'+(c.id===activeId?' on':'');
+    // avatar
+    const avEl=makeAvEl(av,42,isG?'ci-av grp':'ci-av');
+    if(isG){avEl.style.borderRadius='13px';avEl.textContent='👥';avEl.style.background=avc(av);}
+    d.appendChild(avEl);
+    const info=document.createElement('div');info.className='ci-info';
+    info.innerHTML=`<strong>${esc(name)}</strong><span>${esc(prev)}</span>`;
+    const meta=document.createElement('div');meta.className='ci-meta';
+    meta.innerHTML=(c._last?.ts?`<div class="ci-t">${fmtT(c._last.ts)}</div>`:'')+( c._unread?`<div class="ci-u">${c._unread}</div>`:'');
+    const x=document.createElement('button');x.className='ci-x';x.textContent='×';
+    d.appendChild(info);d.appendChild(meta);d.appendChild(x);
+    d.onclick=e=>{if(e.target===x)return;openChat(c.id);};
+    x.onclick=e=>{e.stopPropagation();if(confirm('Leave this chat?'))leaveChat(c.id);};
     el.appendChild(d);
   });
 }
 
+// ── OPEN CHAT ─────────────────────────────────────
 async function openChat(id){
-  activeId=id;
+  activeId=id;editingMsgId=null;
   const c=myChats.find(x=>x.id===id);if(!c)return;
   c._unread=0;
   if(window.innerWidth<=700)G('sb').classList.add('out');
-  const isG=c.type==='group', name=chatName(c), av=chatAv(c);
-  const ha=G('hdr-av');ha.textContent=isG?'👥':ini(av);ha.style.background=avc(av);ha.className='av hdr-av'+(isG?' grp':'');
-  G('hdr-name').textContent=name;
-  G('hdr-sub').textContent=isG?`${c.members.length} members`:'DM';
+  const isG=c.type==='group',name=chatName(c),av=chatAv(c);
+  const ha=G('hdr-av');
+  if(isG){ha.textContent='👥';ha.style.background=avc(av);ha.className='av hdr-av grp';}
+  else{
+    ha.textContent='';ha.className='av hdr-av';
+    const img=await getProfileImg(av);
+    if(img){ha.style.background='none';ha.style.overflow='hidden';ha.style.padding='0';ha.innerHTML=`<img src="${img}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt=""/>`;}
+    else{ha.style.background=avc(av);ha.textContent=ini(av);}
+  }
+  G('hdr-name').textContent=name;G('hdr-sub').textContent=isG?`${c.members.length} members`:'DM';
   G('nochat').style.display='none';G('achat').style.display='flex';
+  // reset input
+  G('mta').placeholder='Message...';G('mta').value='';
+  const editBar=G('edit-bar');if(editBar)editBar.style.display='none';
   renderChats();
   await loadMsgs(id);
   subMsgs(id);
 }
 
 async function loadMsgs(chatId){
-  const el=G('msgs');el.innerHTML='';
+  const el=G('msgs');el.innerHTML='<div class="msys">Loading...</div>';
   try{
     const rows=await dbGet('messages',`chat_id=eq.${chatId}&order=ts.asc`);
+    el.innerHTML='';
     if(!rows||!rows.length){el.innerHTML='<div class="msys">Say hi! 👋</div>';return;}
     let lastD='';
     rows.forEach(m=>{
@@ -1122,36 +1251,99 @@ async function loadMsgs(chatId){
 function buildMsg(m){
   const c=myChats.find(x=>x.id===m.chat_id);
   const isMe=m.from_user===me;
-  const row=document.createElement('div');row.className='mrow'+(isMe?' me':'');
-  const av=document.createElement('div');av.className='av mav';av.style.background=avc(m.from_user);av.textContent=ini(m.from_user);
+  const row=document.createElement('div');row.className='mrow'+(isMe?' me':'');row.id='msg-'+m.id;
+  const av=makeAvEl(m.from_user,26,'mav');
   const body=document.createElement('div');body.className='mbody';
   if(!isMe&&c?.type==='group'){const sn=document.createElement('div');sn.className='msender';sn.textContent=m.from_user;body.appendChild(sn);}
-  if(m.img){
+  if(m.deleted){
+    const bub=document.createElement('div');bub.className='mbub deleted-msg';bub.textContent='🗑 Message deleted';body.appendChild(bub);
+  } else if(m.img){
     const bub=document.createElement('div');bub.className='mimg';
-    const img=document.createElement('img');img.src=m.img;img.alt='img';
-    img.onclick=()=>openLightbox(m.img);bub.appendChild(img);body.appendChild(bub);
+    const img=document.createElement('img');img.src=m.img;img.alt='img';img.onclick=()=>openLightbox(m.img);
+    bub.appendChild(img);body.appendChild(bub);
+  } else if(m.video){
+    const bub=document.createElement('div');bub.className='mimg';
+    const vid=document.createElement('video');vid.src=m.video;vid.controls=true;vid.style.cssText='width:100%;max-width:240px;border-radius:13px;display:block;';
+    bub.appendChild(vid);body.appendChild(bub);
   } else {
     const bub=document.createElement('div');bub.className='mbub';bub.textContent=m.text||'';body.appendChild(bub);
+    if(m.edited){const ed=document.createElement('span');ed.className='msg-edited';ed.textContent=' (edited)';bub.appendChild(ed);}
   }
-  const t=document.createElement('div');t.className='mtime';t.textContent=fmtT(m.ts);body.appendChild(t);
-  row.appendChild(av);row.appendChild(body);return row;
+  const trow=document.createElement('div');trow.className='msg-trow';
+  const t=document.createElement('div');t.className='mtime';t.textContent=fmtT(m.ts);trow.appendChild(t);
+  // actions for own messages
+  if(isMe&&!m.deleted){
+    const acts=document.createElement('div');acts.className='msg-acts';
+    if(!m.img&&!m.video&&m.text){
+      const editBtn=document.createElement('button');editBtn.className='msg-act-btn';editBtn.textContent='✏️';editBtn.title='Edit';
+      editBtn.onclick=()=>startEdit(m);acts.appendChild(editBtn);
+    }
+    const delBtn=document.createElement('button');delBtn.className='msg-act-btn';delBtn.textContent='🗑️';delBtn.title='Unsend';
+    delBtn.onclick=()=>unsendMsg(m.id);
+    acts.appendChild(delBtn);trow.appendChild(acts);
+  }
+  body.appendChild(trow);
+  row.appendChild(av);row.appendChild(body);
+  return row;
 }
 
 function addMsgEl(m){
-  const el=G('msgs');
-  const ph=el.querySelector('.msys');if(ph)ph.remove();
+  const el=G('msgs');const ph=el.querySelector('.msys');if(ph)ph.remove();
   if(m.chat_id===activeId){el.appendChild(buildMsg(m));scrollBot();}
 }
+
+function updateMsgEl(m){
+  const el=G('msg-'+m.id);if(!el)return;
+  const c=myChats.find(x=>x.id===m.chat_id);
+  const newEl=buildMsg(m);el.replaceWith(newEl);
+}
+
 function scrollBot(){const el=G('msgs');requestAnimationFrame(()=>{el.scrollTop=el.scrollHeight;});}
 
 function subMsgs(chatId){
   if(wsMsgs)try{wsMsgs.close();}catch{}
-  wsMsgs=rtSub('messages',`chat_id=eq.${chatId}`,m=>{
-    if(m.from_user===me)return;
-    addMsgEl(m);
-    const c=myChats.find(x=>x.id===chatId);
-    if(c){c._last=m;if(chatId!==activeId)c._unread=(c._unread||0)+1;renderChats();}
+  wsMsgs=rtSub('messages',`chat_id=eq.${chatId}`,data=>{
+    const m=data.record;
+    if(data.type==='INSERT'){
+      if(m.from_user===me)return;
+      addMsgEl(m);
+      const c=myChats.find(x=>x.id===chatId);
+      if(c){c._last=m;if(chatId!==activeId)c._unread=(c._unread||0)+1;renderChats();}
+    } else if(data.type==='UPDATE'){
+      updateMsgEl(m);
+      const c=myChats.find(x=>x.id===chatId);
+      if(c&&c._last?.id===m.id){c._last=m;renderChats();}
+    }
   });
+}
+
+// ── UNSEND / EDIT ─────────────────────────────────
+async function unsendMsg(msgId){
+  if(!confirm('Unsend this message for everyone?'))return;
+  try{
+    await dbPatch('messages',`id=eq.${msgId}`,{deleted:true,text:null,img:null,video:null});
+    // update locally
+    const el=G('msg-'+msgId);
+    if(el){
+      const fakeMsg={id:msgId,chat_id:activeId,from_user:me,deleted:true,ts:Date.now()};
+      el.replaceWith(buildMsg(fakeMsg));
+    }
+    toast('Message unsent');
+  }catch(e){toast('Error: '+e.message);}
+}
+
+function startEdit(m){
+  editingMsgId=m.id;
+  const ta=G('mta');ta.value=m.text||'';ta.focus();
+  G('mta').placeholder='Editing message...';
+  const editBar=G('edit-bar');
+  if(editBar){editBar.style.display='flex';G('edit-bar-text').textContent='Editing: '+trunc(m.text||'',40);}
+}
+
+G('cancel-edit') && (G('cancel-edit').onclick=cancelEdit);
+function cancelEdit(){
+  editingMsgId=null;G('mta').value='';G('mta').placeholder='Message...';
+  const eb=G('edit-bar');if(eb)eb.style.display='none';
 }
 
 // ── SEND MESSAGE ──────────────────────────────────
@@ -1171,84 +1363,80 @@ G('mta').oninput=function(){this.style.height='auto';this.style.height=Math.min(
 document.querySelectorAll('.emj').forEach(b=>b.onclick=()=>{const ta=G('mta');ta.value+=b.dataset.e;ta.focus();});
 
 async function sendMsg(){
-  const ta=G('mta'), text=ta.value.trim();
+  const ta=G('mta'),text=ta.value.trim();
   if(!text&&!pendImg||!activeId)return;
-  const m={id:uid(),chat_id:activeId,from_user:me,text:text||null,img:pendImg||null,ts:Date.now()};
+  // editing mode
+  if(editingMsgId){
+    try{
+      await dbPatch('messages',`id=eq.${editingMsgId}`,{text,edited:true});
+      const el=G('msg-'+editingMsgId);
+      if(el){const fakeMsg={id:editingMsgId,chat_id:activeId,from_user:me,text,edited:true,ts:Date.now(),deleted:false};el.replaceWith(buildMsg(fakeMsg));}
+      toast('Message edited');
+    }catch(e){toast('Error: '+e.message);}
+    cancelEdit();return;
+  }
+  const m={id:uid(),chat_id:activeId,from_user:me,text:text||null,img:pendImg||null,video:null,ts:Date.now(),deleted:false,edited:false};
   addMsgEl(m);ta.value='';ta.style.height='';
   if(pendImg){G('prevwrap').style.display='none';G('prev-img').src='';pendImg=null;}
-  const c=myChats.find(x=>x.id===activeId);
-  if(c){c._last=m;renderChats();}
+  const c=myChats.find(x=>x.id===activeId);if(c){c._last=m;renderChats();}
   try{await dbPost('messages',m);}catch(e){toast('Send failed: '+e.message);}
 }
 
 // ── NEW CHAT ──────────────────────────────────────
 let tags=[];
 function openNewModal(){
-  tags=[];
-  G('tagwrap').querySelectorAll('.tag').forEach(t=>t.remove());
+  tags=[];G('tagwrap').querySelectorAll('.tag').forEach(t=>t.remove());
   G('taginp').value='';G('new-err').textContent='';
   G('gname-f').style.display='none';G('gname').value='';
-  G('m-new').classList.remove('hidden');
-  setTimeout(()=>G('taginp').focus(),80);
+  G('m-new').classList.remove('hidden');setTimeout(()=>G('taginp').focus(),80);
 }
 function addTag(n){
-  n=n.trim().replace(/\s+/g,'_');
-  if(!n||tags.includes(n)||n===me)return;
+  n=n.trim().replace(/\s+/g,'_');if(!n||tags.includes(n)||n===me)return;
   tags.push(n);
   const t=document.createElement('div');t.className='tag';
   t.innerHTML=`<span>${esc(n)}</span><button>×</button>`;
   t.querySelector('button').onclick=()=>{tags=tags.filter(x=>x!==n);t.remove();G('gname-f').style.display=tags.length>=2?'block':'none';};
-  G('tagwrap').insertBefore(t,G('taginp'));
-  G('gname-f').style.display=tags.length>=2?'block':'none';
-  G('new-err').textContent='';
+  G('tagwrap').insertBefore(t,G('taginp'));G('gname-f').style.display=tags.length>=2?'block':'none';G('new-err').textContent='';
 }
 G('taginp').onkeydown=e=>{
   const v=e.target.value.trim();
   if(e.key==='Enter'||e.key===','){e.preventDefault();if(v)addTag(v);e.target.value='';}
-  else if(e.key==='Backspace'&&!v&&tags.length>0){tags.pop();G('tagwrap').querySelectorAll('.tag').forEach((t,i,a)=>{if(i===a.length-1)t.remove();});G('gname-f').style.display=tags.length>=2?'block':'none';}
+  else if(e.key==='Backspace'&&!v&&tags.length>0){tags.pop();const ts2=G('tagwrap').querySelectorAll('.tag');if(ts2.length)ts2[ts2.length-1].remove();G('gname-f').style.display=tags.length>=2?'block':'none';}
 };
 G('tagwrap').onclick=()=>G('taginp').focus();
 G('new-cl').onclick=()=>G('m-new').classList.add('hidden');
 G('m-new').onclick=e=>{if(e.target===G('m-new'))G('m-new').classList.add('hidden');};
-G('new-btn').onclick=openNewModal;
-G('nc-new').onclick=openNewModal;
-
+G('new-btn').onclick=openNewModal;G('nc-new').onclick=openNewModal;
 G('new-ok').onclick=async()=>{
   const v=G('taginp').value.trim();if(v)addTag(v);G('taginp').value='';
   if(!tags.length){G('new-err').textContent='Add at least one username.';return;}
   const btn=G('new-ok');btn.disabled=true;btn.textContent='Checking...';
   try{
     const found=await dbGet('users',`username=in.(${tags.map(t=>`"${t}"`).join(',')})&select=username`);
-    const foundNames=(found||[]).map(u=>u.username);
-    const missing=tags.filter(t=>!foundNames.includes(t));
-    if(missing.length){G('new-err').textContent=`Not signed up yet: ${missing.join(', ')}`;return;}
+    const missing=tags.filter(t=>!(found||[]).map(u=>u.username).includes(t));
+    if(missing.length){G('new-err').textContent=`Not signed up: ${missing.join(', ')}`;return;}
     const isG=tags.length>=2;
     const c={id:uid(),type:isG?'group':'dm',name:isG?(G('gname').value.trim()||tags.join(', ')):tags[0],members:[me,...tags],created_at:new Date().toISOString()};
-    await dbPost('chats',c);
-    c._last=null;c._unread=0;myChats.unshift(c);
+    await dbPost('chats',c);c._last=null;c._unread=0;myChats.unshift(c);
     G('m-new').classList.add('hidden');renderChats();openChat(c.id);
   }catch(e){G('new-err').textContent='Error: '+e.message;}
   finally{btn.disabled=false;btn.textContent='Start Chat →';}
 };
 
-// ── LEAVE CHAT ────────────────────────────────────
 async function leaveChat(id){
   const c=myChats.find(x=>x.id===id);if(!c)return;
   try{
-    const newM=c.members.filter(m2=>m2!==me);
-    if(!newM.length)await dbDel('chats',`id=eq.${id}`);
-    else await dbPatch('chats',`id=eq.${id}`,{members:newM});
+    const nm=c.members.filter(m2=>m2!==me);
+    if(!nm.length)await dbDel('chats',`id=eq.${id}`);else await dbPatch('chats',`id=eq.${id}`,{members:nm});
     myChats=myChats.filter(x=>x.id!==id);
     if(activeId===id){activeId=null;G('achat').style.display='none';G('nochat').style.display='flex';if(window.innerWidth<=700)G('sb').classList.remove('out');}
     renderChats();
   }catch(e){toast('Error: '+e.message);}
 }
 
-// ── INFO MODAL ────────────────────────────────────
 G('info-btn').onclick=()=>{
   const c=myChats.find(x=>x.id===activeId);if(!c)return;
-  G('info-title').textContent=chatName(c);
-  G('info-sub').textContent=c.type==='group'?`Group · ${c.members.length} members`:'Direct Message';
+  G('info-title').textContent=chatName(c);G('info-sub').textContent=c.type==='group'?`Group · ${c.members.length} members`:'Direct Message';
   const ml=G('info-mems');ml.innerHTML='';
   c.members.forEach(n=>{const ch=document.createElement('div');ch.className='memchip';ch.innerHTML=`<div class="memav" style="background:${avc(n)}">${ini(n)}</div>${esc(n)}${n===me?' (you)':''}`;ml.appendChild(ch);});
   G('m-info').classList.remove('hidden');
@@ -1257,48 +1445,37 @@ G('info-cl').onclick=()=>G('m-info').classList.add('hidden');
 G('m-info').onclick=e=>{if(e.target===G('m-info'))G('m-info').classList.add('hidden');};
 G('info-del').onclick=()=>{if(confirm('Leave this chat?')){G('m-info').classList.add('hidden');leaveChat(activeId);}};
 
-// ── BACK / SIGNOUT ────────────────────────────────
-G('hdr-back').onclick=()=>{
-  G('sb').classList.remove('out');activeId=null;
-  G('achat').style.display='none';G('nochat').style.display='flex';
-  renderChats();if(wsMsgs)try{wsMsgs.close();}catch{}
-};
+G('hdr-back').onclick=()=>{G('sb').classList.remove('out');activeId=null;G('achat').style.display='none';G('nochat').style.display='flex';renderChats();if(wsMsgs)try{wsMsgs.close();}catch{}};
 G('out-btn').onclick=()=>{
   if(!confirm('Sign out?'))return;
   me='';myChats=[];activeId=null;localStorage.removeItem('zc_me');
   try{if(wsMsgs)wsMsgs.close();if(wsChats)wsChats.close();}catch{}
   G('s-app').classList.add('hidden');G('s-auth').classList.remove('hidden');
-  swTab('in');G('in-u').value='';G('in-p').value='';
-  G('achat').style.display='none';G('nochat').style.display='flex';
+  swTab('in');G('in-u').value='';G('in-p').value='';G('achat').style.display='none';G('nochat').style.display='flex';
 };
 
-// ── LIGHTBOX ─────────────────────────────────────
 function openLightbox(src){G('limg').src=src;G('lbox').classList.remove('hidden');}
 G('lbox').onclick=()=>G('lbox').classList.add('hidden');
 
-// ── MAIN TAB SWITCH (chat / feed) ─────────────────
+// ── FEED ─────────────────────────────────────────
 function switchMainTab(tab){
   mainTab=tab;
-  const cm=document.querySelector('.cmain'), fs=G('feed-screen');
-  const sbc=G('sb-tab-chat'), sbf=G('sb-tab-feed');
-  const bnc=G('bn-chat'), bnf=G('bn-feed');
+  const cm=document.querySelector('.cmain'),fs=G('feed-screen');
+  const sbc=G('sb-tab-chat'),sbf=G('sb-tab-feed'),bnc=G('bn-chat'),bnf=G('bn-feed');
   if(tab==='feed'){
-    if(cm)cm.style.display='none';
-    if(fs){fs.classList.remove('hidden');fs.style.display='flex';}
+    if(cm)cm.style.display='none';if(fs){fs.classList.remove('hidden');fs.style.display='flex';}
     if(sbc)sbc.className='feed-tab';if(sbf)sbf.className='feed-tab on';
     if(bnc)bnc.className='bnav-btn';if(bnf)bnf.className='bnav-btn on';
     if(window.innerWidth<=700)G('sb').classList.add('out');
     loadFeed();
   } else {
-    if(cm)cm.style.display='';
-    if(fs){fs.classList.add('hidden');fs.style.display='';}
+    if(cm)cm.style.display='';if(fs){fs.classList.add('hidden');fs.style.display='';}
     if(sbc)sbc.className='feed-tab on';if(sbf)sbf.className='feed-tab';
     if(bnc)bnc.className='bnav-btn on';if(bnf)bnf.className='bnav-btn';
     if(window.innerWidth<=700){G('sb').classList.remove('out');G('achat').style.display='none';G('nochat').style.display='flex';}
   }
 }
 
-// ── FEED ─────────────────────────────────────────
 document.addEventListener('click',e=>{
   if(e.target?.id==='ft-all'){feedTab='public';G('ft-all').className='feed-tab on';G('ft-friends').className='feed-tab';loadFeed();}
   if(e.target?.id==='ft-friends'){feedTab='friends';G('ft-friends').className='feed-tab on';G('ft-all').className='feed-tab';loadFeed();}
@@ -1306,29 +1483,32 @@ document.addEventListener('click',e=>{
 });
 
 async function getFriends(){
-  try{
-    const cs=await dbGet('chats',`members=cs.{${me}}&select=members`);
-    const s=new Set([me]);(cs||[]).forEach(c=>(c.members||[]).forEach(m2=>s.add(m2)));return[...s];
-  }catch{return[me];}
+  try{const cs=await dbGet('chats',`members=cs.{${me}}&select=members`);const s=new Set([me]);(cs||[]).forEach(c=>(c.members||[]).forEach(m2=>s.add(m2)));return[...s];}
+  catch{return[me];}
 }
 
 async function loadFeed(){
   const list=G('feed-list');
   list.innerHTML='<div class="feed-empty"><div class="fe-icon">⏳</div><p>Loading...</p></div>';
   try{
-    let q='status=eq.approved&order=created_at.desc&limit=50';
-    if(feedTab==='public'){q+='&visibility=eq.public';}
+    let q='status=eq.approved&order=created_at.desc&limit=30';
+    if(feedTab==='public')q+='&visibility=eq.public';
     else{
-      const friends=await getFriends();
-      q+=`&from_user=in.(${friends.map(f=>`"${f}"`).join(',')})`;
+      const fr=await getFriends();
+      q+=`&from_user=in.(${fr.map(f=>`"${f}"`).join(',')})`;
     }
-    feedPosts=await dbGet('posts',q)||[];
-    await Promise.all(feedPosts.map(async p=>{
-      try{
-        const [lk,cm]=await Promise.all([dbGet('post_likes',`post_id=eq.${p.id}&select=from_user`),dbGet('post_comments',`post_id=eq.${p.id}&select=id`)]);
-        p._likes=lk||[];p._cmts=(cm||[]).length;
-      }catch{p._likes=[];p._cmts=0;}
-    }));
+    // fetch posts and likes/comments in parallel
+    const [posts,allLikes,allCmts]=await Promise.all([
+      dbGet('posts',q),
+      dbGet('post_likes',`select=post_id,from_user`).catch(()=>[]),
+      dbGet('post_comments',`select=post_id,id`).catch(()=>[])
+    ]);
+    feedPosts=posts||[];
+    // attach likes/comments quickly without per-post requests
+    const likeMap={},cmtMap={};
+    (allLikes||[]).forEach(l=>{if(!likeMap[l.post_id])likeMap[l.post_id]=[];likeMap[l.post_id].push(l);});
+    (allCmts||[]).forEach(c=>{cmtMap[c.post_id]=(cmtMap[c.post_id]||0)+1;});
+    feedPosts.forEach(p=>{p._likes=likeMap[p.id]||[];p._cmts=cmtMap[p.id]||0;});
     renderFeed();
   }catch(e){list.innerHTML=`<div class="feed-empty"><div class="fe-icon">😢</div><p>Error: ${esc(e.message)}</p></div>`;}
 }
@@ -1342,11 +1522,13 @@ function renderFeed(){
 }
 
 function buildCard(p){
-  const isMe=p.from_user===me, liked=(p._likes||[]).some(l=>l.from_user===me), lc=(p._likes||[]).length;
+  const isMe=p.from_user===me,liked=(p._likes||[]).some(l=>l.from_user===me),lc=(p._likes||[]).length;
   const card=document.createElement('div');card.className='pcard';card.id='post-'+p.id;
+  // avatar
+  const avEl=makeAvEl(p.from_user,40,'pcard-av');
   card.innerHTML=`
     <div class="pcard-head">
-      <div class="pcard-av" style="background:${avc(p.from_user)}">${ini(p.from_user)}</div>
+      <div id="pcard-av-${p.id}"></div>
       <div class="pcard-user-row">
         <div class="pcard-name-row">
           <div class="pcard-user"><strong>${esc(p.from_user)}</strong><span>· ${timeAgo(p.created_at)}</span></div>
@@ -1357,6 +1539,7 @@ function buildCard(p){
     </div>
     ${p.text?`<div class="pcard-text">${esc(p.text)}</div>`:''}
     ${p.img?`<div class="pcard-img-wrap"><img class="pcard-img" src="${p.img}" alt="post"/></div>`:''}
+    ${p.video?`<div class="pcard-img-wrap"><video controls style="width:100%;border-radius:14px;max-height:380px;background:#000;" src="${p.video}"></video></div>`:''}
     <div class="pcard-actions">
       <button class="pact-btn ${liked?'liked':''}" id="like-btn-${p.id}"><span class="like-icon">${liked?'❤️':'🤍'}</span> <span>${lc||''}</span></button>
       <button class="pact-btn" id="cmt-btn-${p.id}">💬 <span>${p._cmts||''}</span></button>
@@ -1364,11 +1547,15 @@ function buildCard(p){
     <div id="cmts-${p.id}" style="display:none;" class="pcard-comments-wrap">
       <div class="pcard-comments" id="cmts-list-${p.id}"></div>
       <div class="pcomment-inp-row">
-        <div class="pcomment-av-me" style="background:${avc(me)}">${ini(me)}</div>
+        <div id="pcomment-av-${p.id}" style="flex-shrink:0;"></div>
         <input class="pcomment-inp" id="cmt-inp-${p.id}" placeholder="Add a comment..." maxlength="200" autocomplete="off"/>
         <button class="pcomment-send" id="cmt-send-${p.id}"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
       </div>
     </div>`;
+  // inject real avatars
+  const avSlot=card.querySelector('#pcard-av-'+p.id);avSlot.replaceWith(avEl);
+  getProfileImg(p.from_user).then(img=>{if(img){avEl.style.background='none';avEl.style.overflow='hidden';avEl.innerHTML=`<img src="${img}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt=""/>`;}}); 
+  const cmtAvSlot=card.querySelector('#pcomment-av-'+p.id);const meAv=makeAvEl(me,32,'pcomment-av-me');cmtAvSlot.replaceWith(meAv);
   // events
   if(p.img)card.querySelector('.pcard-img').onclick=()=>openLightbox(p.img);
   card.querySelector(`#like-btn-${p.id}`).onclick=()=>toggleLike(p,card);
@@ -1384,15 +1571,15 @@ async function toggleLike(p,card){
   try{
     if(liked){await dbDel('post_likes',`post_id=eq.${p.id}&from_user=eq.${encodeURIComponent(me)}`);p._likes=p._likes.filter(l=>l.from_user!==me);}
     else{await dbPost('post_likes',{id:uid(),post_id:p.id,from_user:me});p._likes=[...(p._likes||[]),{from_user:me}];}
-    const btn=card.querySelector(`#like-btn-${p.id}`);
-    const nl=!liked;btn.className='pact-btn'+(nl?' liked':'');
+    const btn=card.querySelector('#like-btn-'+p.id),nl=!liked;
+    btn.className='pact-btn'+(nl?' liked':'');
     btn.innerHTML=`<span class="like-icon">${nl?'❤️':'🤍'}</span> <span>${p._likes.length||''}</span>`;
   }catch(e){toast('Error: '+e.message);}
 }
 
 async function toggleCmts(p,card){
   const w=card.querySelector('#cmts-'+p.id);if(!w)return;
-  if(w.style.display==='none'){w.style.display='block';await loadCmts(p,card);}else{w.style.display='none';}
+  if(w.style.display==='none'){w.style.display='block';await loadCmts(p,card);}else w.style.display='none';
 }
 
 async function loadCmts(p,card){
@@ -1404,10 +1591,13 @@ async function loadCmts(p,card){
     if(!rows||!rows.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:4px 0;">No comments yet.</div>';return;}
     rows.forEach(c=>{
       const d=document.createElement('div');d.className='pcomment';
-      d.innerHTML=`<div class="pcomment-av" style="background:${avc(c.from_user)}">${ini(c.from_user)}</div><div class="pcomment-body"><div class="pcomment-name">${esc(c.from_user)}</div><div class="pcomment-text">${esc(c.text)}</div></div>`;
-      el.appendChild(d);
+      const avEl=makeAvEl(c.from_user,28,'pcomment-av');
+      d.appendChild(avEl);
+      const bd=document.createElement('div');bd.className='pcomment-body';
+      bd.innerHTML=`<div class="pcomment-name">${esc(c.from_user)}</div><div class="pcomment-text">${esc(c.text)}</div>`;
+      d.appendChild(bd);el.appendChild(d);
     });
-  }catch{el.innerHTML='<div style="font-size:12px;color:var(--danger);">Error loading.</div>';}
+  }catch{el.innerHTML='<div style="font-size:12px;color:var(--danger);">Error.</div>';}
 }
 
 async function sendCmt(p,card){
@@ -1419,44 +1609,54 @@ async function sendCmt(p,card){
     const btn=card.querySelector('#cmt-btn-'+p.id);if(btn)btn.innerHTML='💬 <span>'+p._cmts+'</span>';
     const el=card.querySelector('#cmts-list-'+p.id);
     if(el){
-      const ph=el.querySelector('div');if(ph&&ph.textContent==='No comments yet.')ph.remove();
+      const ph=el.querySelector('div');if(ph&&ph.textContent.includes('No comments'))ph.remove();
       const d=document.createElement('div');d.className='pcomment';
-      d.innerHTML=`<div class="pcomment-av" style="background:${avc(me)}">${ini(me)}</div><div class="pcomment-body"><div class="pcomment-name">${esc(me)}</div><div class="pcomment-text">${esc(text)}</div></div>`;
-      el.appendChild(d);
+      const av=makeAvEl(me,28,'pcomment-av');d.appendChild(av);
+      const bd=document.createElement('div');bd.className='pcomment-body';
+      bd.innerHTML=`<div class="pcomment-name">${esc(me)}</div><div class="pcomment-text">${esc(text)}</div>`;
+      d.appendChild(bd);el.appendChild(d);
     }
   }catch(e){toast('Error: '+e.message);}
 }
 
 // ── NEW POST ──────────────────────────────────────
 function openNewPostModal(){
-  pendPostImg=null;postVis='public';
-  G('post-text').value='';G('post-img-preview').style.display='none';G('post-img-prev').src='';
+  pendPostImg=null;pendPostVid=null;postVis='public';
+  G('post-text').value='';
+  G('post-img-preview').style.display='none';G('post-img-prev').src='';
+  G('post-vid-preview').style.display='none';G('post-vid-prev').src='';
   G('post-err').textContent='';G('ai-scanning').classList.add('hidden');
   G('vis-pub').className='vis-opt on';G('vis-fri').className='vis-opt';
   G('post-submit').disabled=false;G('post-submit').textContent='Post ⚡';
   G('m-post').classList.remove('hidden');
 }
-function setPostVis(v){
-  postVis=v;
-  G('vis-pub').className='vis-opt'+(v==='public'?' on':'');
-  G('vis-fri').className='vis-opt'+(v==='friends'?' on':'');
-}
+function setPostVis(v){postVis=v;G('vis-pub').className='vis-opt'+(v==='public'?' on':'');G('vis-fri').className='vis-opt'+(v==='friends'?' on':'');}
 G('post-img-pick-btn').onclick=()=>G('post-img-file').click();
 G('post-img-file').onchange=e=>{
   const f=e.target.files[0];if(!f)return;
   if(!f.type.startsWith('image/')){toast('Pick an image.');return;}
   if(f.size>4*1024*1024){toast('Max 4MB.');return;}
-  const r=new FileReader();
-  r.onload=ev=>{pendPostImg=ev.target.result;G('post-img-prev').src=pendPostImg;G('post-img-preview').style.display='block';};
+  pendPostVid=null;G('post-vid-preview').style.display='none';
+  const r=new FileReader();r.onload=ev=>{pendPostImg=ev.target.result;G('post-img-prev').src=pendPostImg;G('post-img-preview').style.display='block';};
+  r.readAsDataURL(f);e.target.value='';
+};
+G('post-vid-pick-btn').onclick=()=>G('post-vid-file').click();
+G('post-vid-file').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(!f.type.startsWith('video/')){toast('Pick a video.');return;}
+  if(f.size>20*1024*1024){toast('Max 20MB for videos.');return;}
+  pendPostImg=null;G('post-img-preview').style.display='none';
+  const r=new FileReader();r.onload=ev=>{pendPostVid=ev.target.result;G('post-vid-prev').src=pendPostVid;G('post-vid-preview').style.display='block';};
   r.readAsDataURL(f);e.target.value='';
 };
 G('post-img-remove').onclick=()=>{pendPostImg=null;G('post-img-preview').style.display='none';G('post-img-prev').src='';};
+G('post-vid-remove').onclick=()=>{pendPostVid=null;G('post-vid-preview').style.display='none';G('post-vid-prev').src='';};
 G('post-cancel').onclick=()=>G('m-post').classList.add('hidden');
 G('m-post').onclick=e=>{if(e.target===G('m-post'))G('m-post').classList.add('hidden');};
 
 G('post-submit').onclick=async()=>{
   const text=G('post-text').value.trim();
-  if(!text&&!pendPostImg){G('post-err').textContent='Add a caption or image.';return;}
+  if(!text&&!pendPostImg&&!pendPostVid){G('post-err').textContent='Add a caption, image, or video.';return;}
   const btn=G('post-submit');btn.disabled=true;
   if(pendPostImg){
     btn.textContent='Scanning...';G('ai-scanning').classList.remove('hidden');
@@ -1466,40 +1666,36 @@ G('post-submit').onclick=async()=>{
   }
   btn.textContent='Posting...';
   try{
-    const p={id:uid(),from_user:me,text:text||null,img:pendPostImg||null,visibility:postVis,status:'approved',created_at:Date.now()};
-    await dbPost('posts',p);
-    G('m-post').classList.add('hidden');toast('Posted! ⚡');
+    const p={id:uid(),from_user:me,text:text||null,img:pendPostImg||null,video:pendPostVid||null,visibility:postVis,status:'approved',created_at:Date.now()};
+    await dbPost('posts',p);G('m-post').classList.add('hidden');toast('Posted! ⚡');
     p._likes=[];p._cmts=0;
-    if(feedTab==='public'&&postVis==='public'||feedTab==='friends'){
-      feedPosts.unshift(p);
-      const list=G('feed-list');let inner=list.querySelector('.feed-inner');
-      if(!inner){list.innerHTML='';inner=document.createElement('div');inner.className='feed-inner';list.appendChild(inner);}
-      inner.insertBefore(buildCard(p),inner.firstChild);
-    }
+    feedPosts.unshift(p);
+    const list=G('feed-list');let inner=list.querySelector('.feed-inner');
+    if(!inner){list.innerHTML='';inner=document.createElement('div');inner.className='feed-inner';list.appendChild(inner);}
+    inner.insertBefore(buildCard(p),inner.firstChild);
   }catch(e){G('post-err').textContent='Error: '+e.message;}
   finally{btn.disabled=false;btn.textContent='Post ⚡';}
 };
 
 async function aiSafe(img,caption){
   try{
-    const b64=img.split(',')[1], mime=(img.match(/data:([^;]+)/)||[])[1]||'image/jpeg';
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:10,system:'Content moderator for a teen app. Reply ONLY "SAFE" or "UNSAFE". Mark UNSAFE for: nudity, sexual content, graphic violence, drugs, weapons, hate symbols.',messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mime,data:b64}},{type:'text',text:`Caption: "${caption||''}". Safe for teens?`}]}]})});
+    const b64=img.split(',')[1],mime=(img.match(/data:([^;]+)/)||[])[1]||'image/jpeg';
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:10,system:'Content moderator for a teen app. Reply ONLY "SAFE" or "UNSAFE". UNSAFE = nudity, sexual content, graphic violence, drugs, weapons, hate.',messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mime,data:b64}},{type:'text',text:`Caption:"${caption||''}". Safe for teens?`}]}]})});
     const d=await r.json();return(d.content?.[0]?.text?.trim().toUpperCase())==='SAFE';
   }catch{return true;}
 }
 
 // ── ACCOUNT SETTINGS ──────────────────────────────
 G('acct-btn').onclick=()=>{
-  setAcctTab('pw');
-  ['pw-cur','pw-new','pw-new2','del-pw'].forEach(id=>G(id).value='');
+  setAcctTab('pw');['pw-cur','pw-new','pw-new2','del-pw'].forEach(id=>G(id).value='');
   G('pw-strength-fill').style.width='0%';G('pw-strength-label').textContent='';
   G('m-acct').classList.remove('hidden');
 };
 G('at-pw').onclick=()=>setAcctTab('pw');
 G('at-del').onclick=()=>setAcctTab('del');
+G('at-prof').onclick=()=>setAcctTab('prof');
 function setAcctTab(t){
-  G('af-pw').style.display=t==='pw'?'block':'none';G('af-del').style.display=t==='del'?'block':'none';
-  G('at-pw').className='acct-tab'+(t==='pw'?' on':'');G('at-del').className='acct-tab'+(t==='del'?' on':'');
+  ['pw','del','prof'].forEach(x=>{G('af-'+x).style.display=x===t?'block':'none';G('at-'+x).className='acct-tab'+(x===t?' on':'');});
   G('pw-err').textContent='';G('del-err').textContent='';
 }
 G('pw-cancel').onclick=()=>G('m-acct').classList.add('hidden');
@@ -1512,16 +1708,15 @@ G('pw-new').oninput=function(){
   f.style.width=lv.w;f.style.background=lv.c;l.textContent=lv.t;l.style.color=lv.c;
 };
 G('pw-save').onclick=async()=>{
-  const cur=G('pw-cur').value, nw=G('pw-new').value, nw2=G('pw-new2').value;
+  const cur=G('pw-cur').value,nw=G('pw-new').value,nw2=G('pw-new2').value;
   if(!cur||!nw||!nw2){G('pw-err').textContent='Fill in all fields.';return;}
   if(nw.length<4){G('pw-err').textContent='Min 4 characters.';return;}
-  if(nw===cur){G('pw-err').textContent='Must be different from current.';return;}
+  if(nw===cur){G('pw-err').textContent='Must differ from current.';return;}
   if(nw!==nw2){G('pw-err').textContent='Passwords do not match.';return;}
   const btn=G('pw-save');btn.disabled=true;btn.innerHTML='<span class="spin"></span>Updating...';
   try{
-    const ch=await sha256(cur);
-    const rows=await dbGet('users',`username=eq.${encodeURIComponent(me)}&password_hash=eq.${encodeURIComponent(ch)}&select=username`);
-    if(!rows||!rows.length){G('pw-err').textContent='Current password is wrong.';return;}
+    const rows=await dbGet('users',`username=eq.${encodeURIComponent(me)}&password_hash=eq.${encodeURIComponent(await sha256(cur))}&select=username`);
+    if(!rows?.length){G('pw-err').textContent='Current password is wrong.';return;}
     await dbPatch('users',`username=eq.${encodeURIComponent(me)}`,{password_hash:await sha256(nw)});
     G('m-acct').classList.add('hidden');toast('Password updated ✅');
   }catch(e){G('pw-err').textContent='Error: '+e.message;}
@@ -1531,32 +1726,62 @@ G('del-confirm').onclick=async()=>{
   const pw=G('del-pw').value;if(!pw){G('del-err').textContent='Enter your password.';return;}
   const btn=G('del-confirm');btn.disabled=true;btn.textContent='Deleting...';
   try{
-    const h=await sha256(pw);
-    const rows=await dbGet('users',`username=eq.${encodeURIComponent(me)}&password_hash=eq.${encodeURIComponent(h)}&select=username`);
-    if(!rows||!rows.length){G('del-err').textContent='Wrong password.';return;}
+    const rows=await dbGet('users',`username=eq.${encodeURIComponent(me)}&password_hash=eq.${encodeURIComponent(await sha256(pw))}&select=username`);
+    if(!rows?.length){G('del-err').textContent='Wrong password.';return;}
     const uc=await dbGet('chats',`members=cs.{${me}}`);
     for(const c of(uc||[])){const nm=c.members.filter(m2=>m2!==me);if(!nm.length)await dbDel('chats',`id=eq.${c.id}`);else await dbPatch('chats',`id=eq.${c.id}`,{members:nm});}
     await dbDel('messages',`from_user=eq.${encodeURIComponent(me)}`);
     await dbDel('users',`username=eq.${encodeURIComponent(me)}`);
     localStorage.removeItem('zc_me');me='';myChats=[];activeId=null;
-    if(wsMsgs)try{wsMsgs.close();}catch{}if(wsChats)try{wsChats.close();}catch{}
+    try{if(wsMsgs)wsMsgs.close();if(wsChats)wsChats.close();}catch{}
     G('m-acct').classList.add('hidden');G('s-app').classList.add('hidden');G('s-auth').classList.remove('hidden');
-    swTab('in');G('in-u').value='';G('in-p').value='';
-    G('achat').style.display='none';G('nochat').style.display='flex';
-    toast('Account deleted 👋');
+    swTab('in');G('in-u').value='';G('in-p').value='';G('achat').style.display='none';G('nochat').style.display='flex';toast('Account deleted 👋');
   }catch(e){G('del-err').textContent='Error: '+e.message;}
   finally{btn.disabled=false;btn.textContent='🗑️ Permanently Delete My Account';}
 };
 
+// Profile image
+G('prof-img-btn').onclick=()=>G('prof-img-file').click();
+G('prof-img-file').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(!f.type.startsWith('image/')){toast('Pick an image.');return;}
+  if(f.size>2*1024*1024){toast('Max 2MB for profile image.');return;}
+  const r=new FileReader();
+  r.onload=async ev=>{
+    const b64=ev.target.result;
+    G('prof-preview').src=b64;G('prof-preview').style.display='block';
+    const btn=G('prof-save-btn');btn.disabled=true;btn.textContent='Saving...';
+    try{
+      await dbPatch('users',`username=eq.${encodeURIComponent(me)}`,{profile_img:b64});
+      profileCache[me]=b64;await refreshMyAvatar();toast('Profile picture updated! ✅');
+    }catch(e){toast('Error: '+e.message);}
+    finally{btn.disabled=false;btn.textContent='Save Profile Picture';}
+  };
+  r.readAsDataURL(f);e.target.value='';
+};
+G('prof-save-btn').onclick=async()=>{
+  const src=G('prof-preview').src;
+  if(!src||src===window.location.href)return;
+  try{
+    await dbPatch('users',`username=eq.${encodeURIComponent(me)}`,{profile_img:src});
+    profileCache[me]=src;await refreshMyAvatar();toast('Profile picture saved! ✅');
+    G('m-acct').classList.add('hidden');
+  }catch(e){toast('Error: '+e.message);}
+};
+G('prof-remove-btn').onclick=async()=>{
+  if(!confirm('Remove profile picture?'))return;
+  try{
+    await dbPatch('users',`username=eq.${encodeURIComponent(me)}`,{profile_img:null});
+    profileCache[me]=null;await refreshMyAvatar();
+    G('prof-preview').src='';G('prof-preview').style.display='none';
+    toast('Profile picture removed');
+  }catch(e){toast('Error: '+e.message);}
+};
+
 // ── PARENTAL CONTROLS ─────────────────────────────
-// All session-only — resets every page load
 G('parent-link').onclick=()=>openPC();
 G('pc-sb-btn').onclick=()=>openPC();
-function openPC(){
-  G('pc-master-inp').value='';G('pc-pin-err').textContent='';
-  G('pc-pin-overlay').classList.remove('hidden');
-  setTimeout(()=>G('pc-master-inp').focus(),100);
-}
+function openPC(){G('pc-master-inp').value='';G('pc-pin-err').textContent='';G('pc-pin-overlay').classList.remove('hidden');setTimeout(()=>G('pc-master-inp').focus(),100);}
 G('pc-pin-cancel').onclick=()=>G('pc-pin-overlay').classList.add('hidden');
 G('pc-pin-cancel2').onclick=()=>G('pc-pin-overlay').classList.add('hidden');
 G('pc-master-submit').onclick=async()=>{
@@ -1567,7 +1792,6 @@ G('pc-master-submit').onclick=async()=>{
 G('pc-master-inp').onkeydown=e=>{if(e.key==='Enter')G('pc-master-submit').click();};
 
 async function openPCDash(){
-  // accounts section
   const accEl=G('pc-accounts');accEl.innerHTML='';
   try{
     const rows=await dbGet('users',`username=eq.${encodeURIComponent(me)}&select=username,created_at`);
@@ -1575,19 +1799,17 @@ async function openPCDash(){
     const row=document.createElement('div');row.className='pc-user-row';
     row.innerHTML=`<div class="pc-user-av" style="background:${avc(me)}">${ini(me)}</div><div class="pc-user-info"><strong>${esc(me)}</strong><span>Logged in · joined ${jd}</span></div>`;
     accEl.appendChild(row);
-  }catch{accEl.innerHTML='<p style="font-size:13px;color:var(--text3);">Could not load account info.</p>';}
-  // chats section
+  }catch{accEl.innerHTML='<p style="font-size:13px;color:var(--text3);">Could not load.</p>';}
   const chatEl=G('pc-chats');chatEl.innerHTML='<div style="font-size:12px;color:var(--text3);">Loading...</div>';
   try{
     const cs=await dbGet('chats',`members=cs.{${me}}&order=created_at.desc`)||[];
     chatEl.innerHTML='';
-    if(!cs.length){chatEl.innerHTML='<p style="font-size:13px;color:var(--text3);">No chats yet.</p>';} 
+    if(!cs.length){chatEl.innerHTML='<p style="font-size:13px;color:var(--text3);">No chats yet.</p>';}
     else{
       for(const c of cs.slice(0,20)){
         const name=chatName(c)||'Chat';
-        const w=document.createElement('div');
-        const row=document.createElement('div');row.className='pc-chat-row';
-        const msgsDiv=document.createElement('div');msgsDiv.className='pc-chat-msgs';
+        const w=document.createElement('div'),row=document.createElement('div');
+        row.className='pc-chat-row';const msgsDiv=document.createElement('div');msgsDiv.className='pc-chat-msgs';
         row.innerHTML=`<strong>💬 ${esc(name)}</strong><span>${c.type==='group'?'Group':'DM'} · ${c.members.length} members</span>`;
         row.onclick=async()=>{
           if(msgsDiv.classList.contains('open')){msgsDiv.classList.remove('open');return;}
@@ -1596,7 +1818,7 @@ async function openPCDash(){
             const msgs=await dbGet('messages',`chat_id=eq.${c.id}&order=ts.asc&limit=100`)||[];
             msgsDiv.innerHTML='';
             if(!msgs.length){msgsDiv.innerHTML='<p style="font-size:12px;color:var(--text3);">No messages.</p>';return;}
-            msgs.forEach(m=>{const ln=document.createElement('div');ln.className='pc-msg-line';ln.innerHTML=`<strong>${esc(m.from_user)}</strong>: ${m.img?'📷 [Image]':esc(m.text||'')}`;msgsDiv.appendChild(ln);});
+            msgs.forEach(m=>{const ln=document.createElement('div');ln.className='pc-msg-line';ln.innerHTML=`<strong>${esc(m.from_user)}</strong>: ${m.deleted?'[deleted]':m.img?'📷':m.video?'🎥':esc(m.text||'')}`;msgsDiv.appendChild(ln);});
           }catch{msgsDiv.innerHTML='<p style="font-size:12px;color:var(--danger);">Error.</p>';}
         };
         w.appendChild(row);w.appendChild(msgsDiv);chatEl.appendChild(w);
@@ -1607,85 +1829,247 @@ async function openPCDash(){
   let mpS=G('pc-master-pw-section');
   if(!mpS){
     mpS=document.createElement('div');mpS.id='pc-master-pw-section';mpS.className='pc-section';
-    mpS.innerHTML=`<h4>Master Password</h4><p style="font-size:13px;color:var(--text3);margin-bottom:10px;">Default is <strong>parent123</strong>. Change it here.</p><div class="field"><label>Current</label><input class="inp" type="password" id="mp-cur" placeholder="Current master password"/></div><div class="field"><label>New</label><input class="inp" type="password" id="mp-new" placeholder="New password"/></div><div class="field"><label>Confirm</label><input class="inp" type="password" id="mp-new2" placeholder="Repeat new password"/></div><div class="merr" id="mp-err"></div><button class="mbtn ok" id="mp-save" style="width:100%;margin-top:4px;">Update Master Password</button>`;
+    mpS.innerHTML=`<h4>🔑 Master Password</h4><p style="font-size:13px;color:var(--text3);margin-bottom:10px;">Change the password used to access parental controls. This is saved permanently on this device.</p><div class="field"><label>Current Master Password</label><input class="inp" type="password" id="mp-cur" placeholder="Current password"/></div><div class="field"><label>New Password</label><input class="inp" type="password" id="mp-new" placeholder="New password (min 4 chars)"/></div><div class="field"><label>Confirm New Password</label><input class="inp" type="password" id="mp-new2" placeholder="Repeat new password"/></div><div class="merr" id="mp-err"></div><button class="mbtn ok" id="mp-save" style="width:100%;margin-top:4px;">Save New Password</button>`;
     G('pc-dash-close').parentElement.before(mpS);
-    G('mp-save').onclick=async()=>{
+    G('mp-save').onclick=()=>{
       const cur=G('mp-cur').value,nw=G('mp-new').value,nw2=G('mp-new2').value;
       if(!cur||!nw||!nw2){G('mp-err').textContent='Fill in all fields.';return;}
+      if(cur!==_masterPw){G('mp-err').textContent='Current password is wrong.';return;}
       if(nw.length<4){G('mp-err').textContent='Min 4 characters.';return;}
       if(nw!==nw2){G('mp-err').textContent='Passwords do not match.';return;}
-      if(cur!==_masterPw){G('mp-err').textContent='Current master password is wrong.';return;}
-      _masterPw=nw;G('mp-cur').value='';G('mp-new').value='';G('mp-new2').value='';
-      toast('Master password updated ✅');
+      _masterPw=nw;
+      localStorage.setItem('zc_master_pw',nw);
+      G('mp-cur').value='';G('mp-new').value='';G('mp-new2').value='';
+      G('mp-err').textContent='';
+      toast('Master password saved permanently ✅');
     };
   }
   G('pc-dash').classList.remove('hidden');
 }
-
 G('pc-dash-close').onclick=()=>G('pc-dash').classList.add('hidden');
-G('pc-lock-btn').onclick=()=>{
-  _sessionLocked=true;G('pc-dash').classList.add('hidden');
-  G('locked-screen').classList.remove('hidden');
-  me='';myChats=[];activeId=null;
-  G('s-app').classList.add('hidden');G('s-auth').classList.remove('hidden');
+G('pc-lock-btn').onclick=()=>{G('pc-dash').classList.add('hidden');G('locked-screen').classList.remove('hidden');
+  me='';myChats=[];activeId=null;G('s-app').classList.add('hidden');G('s-auth').classList.remove('hidden');
 };
 G('pc-change-pin').onclick=()=>{
-  G('pc-dash').classList.add('hidden');
-  G('pc-master-input-wrap').style.display='none';
-  G('pc-pin-input-wrap').style.display='block';
-  G('pc-pin-sub').textContent='Set a new 4-digit lock PIN.';
+  G('pc-dash').classList.add('hidden');G('pc-master-input-wrap').style.display='none';
+  G('pc-pin-input-wrap').style.display='block';G('pc-pin-sub').textContent='Set a new 4-digit lock PIN.';
   G('pc-pin-overlay').classList.remove('hidden');
 };
 
 // Lock screen PIN
-(function setupLockPin(){
-  let pin='';
-  const dots=G('locked-screen').querySelectorAll('.pc-pin-dot');
-  function upDots(){dots.forEach((d,i)=>d.classList.toggle('filled',i<pin.length));}
-  G('lock-numpad').querySelectorAll('.pc-key').forEach(btn=>{
-    btn.onclick=()=>{
-      const k=btn.dataset.k;
-      if(k==='del')pin=pin.slice(0,-1);
-      else if(pin.length<4)pin+=k;
-      G('lock-err').textContent='';upDots();
-      if(pin.length===4){
-        if(pin===_sessionPin){_sessionLocked=false;G('locked-screen').classList.add('hidden');}
-        else{G('lock-err').textContent='Wrong PIN.';pin='';upDots();}
-      }
-    };
+(function(){
+  let pin='';const dots=G('locked-screen').querySelectorAll('.pc-pin-dot');
+  function upD(){dots.forEach((d,i)=>d.classList.toggle('filled',i<pin.length));}
+  G('lock-numpad').querySelectorAll('.pc-key').forEach(b=>{
+    b.onclick=()=>{const k=b.dataset.k;if(k==='del')pin=pin.slice(0,-1);else if(pin.length<4)pin+=k;G('lock-err').textContent='';upD();
+    if(pin.length===4){if(pin===_devicePin){
+  _deviceLocked=false;localStorage.removeItem('zc_device_locked');
+  G('locked-screen').classList.add('hidden');
+  // Resume auto-login after unlock
+  const saved=localStorage.getItem('zc_me');
+  if(saved&&!me){
+    dbGet('users',`username=eq.${encodeURIComponent(saved)}&select=username`).then(rows=>{
+      if(rows?.length){me=rows[0].username;enterApp();}
+    }).catch(()=>{});
+  }
+}else{G('lock-err').textContent='Wrong PIN.';pin='';upD();}}}; 
   });
 })();
 
 // Change PIN numpad
-(function setupChangePin(){
-  let pin='',step='first',firstPin='';
+(function(){
+  let pin='',step='first',first='';
   const dots=G('pc-pin-dots').querySelectorAll('.pc-pin-dot');
-  function upDots(){dots.forEach((d,i)=>d.classList.toggle('filled',i<pin.length));}
-  G('pc-numpad').querySelectorAll('.pc-key').forEach(btn=>{
-    btn.onclick=()=>{
-      const k=btn.dataset.k;
-      if(k==='del')pin=pin.slice(0,-1);
-      else if(pin.length<4)pin+=k;
-      if(G('pc-pin-err2'))G('pc-pin-err2').textContent='';upDots();
-      if(pin.length===4){
-        if(step==='first'){firstPin=pin;pin='';step='confirm';G('pc-pin-sub').textContent='Confirm your new PIN.';upDots();}
-        else{
-          if(pin===firstPin){_sessionPin=pin;G('pc-pin-overlay').classList.add('hidden');G('pc-master-input-wrap').style.display='block';G('pc-pin-input-wrap').style.display='none';toast('Lock PIN updated ✅');step='first';firstPin='';pin='';}
-          else{if(G('pc-pin-err2'))G('pc-pin-err2').textContent='PINs did not match.';pin='';step='first';firstPin='';G('pc-pin-sub').textContent='Set a new 4-digit lock PIN.';upDots();}
-        }
-      }
-    };
+  function upD(){dots.forEach((d,i)=>d.classList.toggle('filled',i<pin.length));}
+  G('pc-numpad').querySelectorAll('.pc-key').forEach(b=>{
+    b.onclick=()=>{const k=b.dataset.k;if(k==='del')pin=pin.slice(0,-1);else if(pin.length<4)pin+=k;if(G('pc-pin-err2'))G('pc-pin-err2').textContent='';upD();
+    if(pin.length===4){
+      if(step==='first'){first=pin;pin='';step='confirm';G('pc-pin-sub').textContent='Confirm your new PIN.';upD();}
+      else{if(pin===first){_devicePin=pin;localStorage.setItem('zc_device_pin',pin);G('pc-pin-overlay').classList.add('hidden');G('pc-master-input-wrap').style.display='block';G('pc-pin-input-wrap').style.display='none';toast('Lock PIN updated ✅');step='first';first='';pin='';}
+      else{if(G('pc-pin-err2'))G('pc-pin-err2').textContent='PINs did not match.';pin='';step='first';first='';G('pc-pin-sub').textContent='Set a new 4-digit lock PIN.';upD();}}
+    }};
   });
 })();
 
+
+// ── USER SEARCH ──────────────────────────────────
+let chatSearchTimer=null, feedSearchTimer=null;
+let allUsers=[]; // cached full user list
+let usersLoaded=false;
+
+async function loadAllUsers(){
+  if(usersLoaded) return;
+  try{
+    const rows = await dbGet('users','select=username&order=username.asc');
+    allUsers = (rows||[]).filter(u=>u.username!==me);
+    usersLoaded = true;
+  }catch(e){ allUsers=[]; }
+}
+
+function filterUsers(query){
+  const q = query.toLowerCase().trim();
+  if(!q) return allUsers.slice(0,20);
+  return allUsers.filter(u=>u.username.toLowerCase().includes(q)).slice(0,20);
+}
+
+function buildUserResult(u, actionLabel, actionClass, onAction){
+  const d = document.createElement('div');
+  d.className = 'sresult';
+  // No profile images shown in search — just username initial avatar
+  const avHtml = `<div class="sresult-av" style="background:${avc(u.username)}">${ini(u.username)}</div>`;
+  d.innerHTML = `${avHtml}<div class="sresult-info"><strong>${esc(u.username)}</strong><span>ZapChat user</span></div><button class="sresult-action ${actionClass}">${actionLabel}</button>`;
+  d.querySelector('.sresult-action').onclick = e => { e.stopPropagation(); onAction(u); };
+  return d;
+}
+
+function showSearchResults(resultsEl, users, actionLabel, actionClass, onAction){
+  resultsEl.innerHTML='';
+  resultsEl.classList.remove('hidden');
+  if(!users.length){
+    resultsEl.innerHTML='<div class="search-empty">No users found</div>';
+    return;
+  }
+  users.forEach(u => resultsEl.appendChild(buildUserResult(u, actionLabel, actionClass, onAction)));
+}
+
+// ── CHAT SEARCH ───────────────────────────────────
+const chatInp = G('chat-search-inp');
+const chatResults = G('chat-search-results');
+const chatClear = G('chat-search-clear');
+
+chatInp.onfocus = async () => {
+  await loadAllUsers();
+  if(!chatInp.value.trim()){
+    showSearchResults(chatResults, allUsers.slice(0,20), '💬 Message', '', u => {
+      chatInp.value='';chatResults.classList.add('hidden');chatClear.classList.add('hidden');
+      startChatWith(u.username);
+    });
+  }
+};
+
+chatInp.oninput = () => {
+  const v = chatInp.value.trim();
+  chatClear.classList.toggle('hidden', !v);
+  clearTimeout(chatSearchTimer);
+  chatSearchTimer = setTimeout(async()=>{
+    await loadAllUsers();
+    const users = filterUsers(v);
+    showSearchResults(chatResults, users, '💬 Message', '', u => {
+      chatInp.value='';chatResults.classList.add('hidden');chatClear.classList.add('hidden');
+      startChatWith(u.username);
+    });
+  }, 200);
+};
+
+chatClear.onclick = () => {
+  chatInp.value='';chatResults.classList.add('hidden');chatClear.classList.add('hidden');chatInp.focus();
+};
+
+document.addEventListener('click', e => {
+  if(!G('chat-search-inp').contains(e.target) && !G('chat-search-results').contains(e.target)){
+    G('chat-search-results').classList.add('hidden');
+  }
+  if(!G('feed-search-inp').contains(e.target) && !G('feed-search-results').contains(e.target)){
+    G('feed-search-results').classList.add('hidden');
+  }
+});
+
+async function startChatWith(username){
+  // check if DM already exists
+  const existing = myChats.find(c => c.type==='dm' && c.members.includes(username));
+  if(existing){ openChat(existing.id); return; }
+  // create new DM
+  try{
+    const c={id:uid(),type:'dm',name:username,members:[me,username],created_at:new Date().toISOString()};
+    await dbPost('chats',c);
+    c._last=null;c._unread=0;myChats.unshift(c);
+    renderChats();openChat(c.id);
+    toast('Chat started with '+username+' 💬');
+  }catch(e){toast('Error: '+e.message);}
+}
+
+// ── FEED SEARCH ───────────────────────────────────
+const feedInp = G('feed-search-inp');
+const feedResults = G('feed-search-results');
+const feedClear = G('feed-search-clear');
+
+feedInp.onfocus = async () => {
+  await loadAllUsers();
+  if(!feedInp.value.trim()){
+    showSearchResults(feedResults, allUsers.slice(0,20), '👤 View Posts', 'feed-action', u => {
+      feedInp.value=u.username;feedResults.classList.add('hidden');
+      viewUserPosts(u.username);
+    });
+  }
+};
+
+feedInp.oninput = () => {
+  const v = feedInp.value.trim();
+  feedClear.classList.toggle('hidden', !v);
+  clearTimeout(feedSearchTimer);
+  feedSearchTimer = setTimeout(async()=>{
+    await loadAllUsers();
+    const users = filterUsers(v);
+    showSearchResults(feedResults, users, '👤 View Posts', 'feed-action', u => {
+      feedInp.value=u.username;feedResults.classList.add('hidden');
+      viewUserPosts(u.username);
+    });
+  }, 200);
+};
+
+feedClear.onclick = () => {
+  feedInp.value='';feedResults.classList.add('hidden');feedClear.classList.add('hidden');
+  feedInp.focus();loadFeed();
+};
+
+async function viewUserPosts(username){
+  const list = G('feed-list');
+  list.innerHTML='<div class="feed-empty"><div class="fe-icon">⏳</div><p>Loading posts from '+esc(username)+'...</p></div>';
+  try{
+    const posts = await dbGet('posts',`from_user=eq.${encodeURIComponent(username)}&status=eq.approved&order=created_at.desc&limit=30`)||[];
+    if(!posts.length){list.innerHTML=`<div class="feed-empty"><div class="fe-icon">📸</div><p>No posts from ${esc(username)} yet.</p></div>`;return;}
+    // attach likes/comments
+    const [allLikes,allCmts]=await Promise.all([
+      dbGet('post_likes',`select=post_id,from_user`).catch(()=>[]),
+      dbGet('post_comments',`select=post_id,id`).catch(()=>[])
+    ]);
+    const likeMap={},cmtMap={};
+    (allLikes||[]).forEach(l=>{if(!likeMap[l.post_id])likeMap[l.post_id]=[];likeMap[l.post_id].push(l);});
+    (allCmts||[]).forEach(c=>{cmtMap[c.post_id]=(cmtMap[c.post_id]||0)+1;});
+    posts.forEach(p=>{p._likes=likeMap[p.id]||[];p._cmts=cmtMap[p.id]||0;});
+    feedPosts=posts;
+    list.innerHTML='';
+    const inner=document.createElement('div');inner.className='feed-inner';
+    // user header
+    const hdr=document.createElement('div');
+    hdr.style.cssText='padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);margin-bottom:1px;';
+    hdr.innerHTML=`<div style="width:48px;height:48px;border-radius:50%;background:${avc(username)};display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;">${ini(username)}</div><div><strong style="font-size:16px;">${esc(username)}</strong><div style="font-size:12px;color:var(--text3);">${posts.length} post${posts.length!==1?'s':''}</div></div><button onclick="feedClear.click()" style="margin-left:auto;padding:6px 12px;border-radius:8px;border:1px solid var(--border2);background:none;color:var(--text3);cursor:pointer;font-size:12px;">✕ Clear</button>`;
+    inner.appendChild(hdr);
+    posts.forEach(p=>inner.appendChild(buildCard(p)));
+    list.appendChild(inner);
+  }catch(e){list.innerHTML=`<div class="feed-empty"><div class="fe-icon">😢</div><p>Error: ${esc(e.message)}</p></div>`;}
+}
+
+// reload users list when entering app
+const _origEnterApp = enterApp;
+enterApp = async function(){
+  usersLoaded = false; // reset so it reloads for new user
+  await _origEnterApp();
+};
+
+
+
+
 // ── AUTO LOGIN ────────────────────────────────────
 (async()=>{
+  // Always check device lock first — applies to ALL accounts on this device
+  if(_deviceLocked){
+    G('locked-screen').classList.remove('hidden');
+    return; // don't auto-login, force PIN entry first
+  }
   const saved=localStorage.getItem('zc_me');
   if(saved){
-    try{
-      const rows=await dbGet('users',`username=eq.${encodeURIComponent(saved)}&select=username`);
-      if(rows&&rows.length>0){me=rows[0].username;await enterApp();return;}
-    }catch{}
+    try{const rows=await dbGet('users',`username=eq.${encodeURIComponent(saved)}&select=username`);if(rows?.length){me=rows[0].username;await enterApp();return;}}catch{}
     localStorage.removeItem('zc_me');
   }
 })();
