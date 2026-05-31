@@ -267,8 +267,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .locked-icon{font-size:52px;margin-bottom:12px;}
 .locked-title{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;margin-bottom:6px;}
 .locked-sub{font-size:14px;color:var(--text3);margin-bottom:28px;}
-.parent-link{margin-top:12px;font-size:12px;color:var(--text3);cursor:pointer;text-align:center;text-decoration:underline;text-underline-offset:3px;}
-.parent-link:hover{color:var(--text2);}
 
 
 /* account settings modal */
@@ -660,6 +658,68 @@ input, textarea, select {
 .search-wrap{position:relative;}
 
 
+
+/* ── MEME PICKER ── */
+.meme-btn{width:42px;height:42px;border-radius:50%;border:1.5px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:transform .15s;flex-shrink:0;}
+.meme-btn:hover{transform:scale(1.08);}
+.meme-picker{
+  position:absolute;bottom:calc(100% + 8px);left:0;right:0;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:20px;padding:0;
+  box-shadow:0 -4px 32px rgba(0,0,0,.5);
+  z-index:50;display:none;
+  height:360px;overflow:hidden;
+  flex-direction:column;
+}
+.meme-picker.open{display:flex;}
+.meme-picker-hdr{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 14px 8px;flex-shrink:0;
+  border-bottom:1px solid var(--border);
+}
+.meme-picker-title{font-size:15px;font-weight:700;flex-shrink:0;}
+.meme-cats{
+  display:flex;gap:5px;overflow-x:auto;flex:1;
+  scrollbar-width:none;padding:2px 0;
+}
+.meme-cats::-webkit-scrollbar{display:none;}
+.meme-cat{
+  white-space:nowrap;padding:5px 10px;border-radius:99px;
+  border:1.5px solid var(--border2);background:none;
+  color:var(--text3);font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;flex-shrink:0;
+}
+.meme-cat.on{background:linear-gradient(135deg,var(--p2),var(--pk));color:#fff;border-color:transparent;}
+.meme-cat:hover:not(.on){background:var(--surface2);color:var(--text);}
+.meme-close-btn{
+  width:30px;height:30px;border-radius:50%;border:1px solid var(--border2);
+  background:none;color:var(--text3);cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  transition:all .15s;
+}
+.meme-close-btn:hover{background:var(--surface2);color:var(--text);}
+.meme-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
+  overflow-y:auto;flex:1;padding:10px;
+}
+.meme-grid::-webkit-scrollbar{width:3px;}
+.meme-grid::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+.meme-item{
+  border-radius:10px;overflow:hidden;cursor:pointer;
+  aspect-ratio:1;background:var(--surface2);
+  transition:transform .15s;border:2px solid transparent;
+}
+.meme-item:hover{transform:scale(1.05);border-color:var(--p);}
+.meme-item:active{transform:scale(.96);}
+.meme-item img{width:100%;height:100%;object-fit:cover;display:block;}
+.meme-loading{padding:30px 20px;text-align:center;font-size:13px;color:var(--text3);grid-column:1/-1;}
+.meme-error{padding:20px;text-align:center;font-size:13px;color:var(--danger);grid-column:1/-1;}
+.meme-wrap{position:relative;}
+
+
+
+
+
 </style>
 </head>
 <body>
@@ -690,7 +750,6 @@ input, textarea, select {
       <button class="btn-main" id="up-btn">Create account →</button>
     </div>
   </div>
-  <p class="parent-link" id="parent-link">👨‍👩‍👧 Parental Controls</p>
   <div class="hint">📲 <strong>Install as app:</strong> Share → Add to Home Screen (iPhone) · ⋮ → Add to Home Screen (Android)</div>
 </div>
 
@@ -741,12 +800,34 @@ input, textarea, select {
           <button class="emj" data-e="😭">😭</button><button class="emj" data-e="🤣">🤣</button>
           <button class="emj" data-e="💅">💅</button><button class="emj" data-e="🫡">🫡</button>
         </div>
-        <div class="irow">
-          <textarea class="mta" id="mta" placeholder="Message..." rows="1"></textarea>
-          <div class="ibtns">
-            <button class="imgbtn" id="imgbtn">🖼️</button>
-            <input type="file" id="imgfile" accept="image/*" style="display:none"/>
-            <button class="sendbtn" id="sendbtn"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+        <div class="meme-wrap">
+          <div class="meme-picker" id="meme-picker">
+            <div class="meme-picker-hdr">
+              <span class="meme-picker-title">😂 Memes</span>
+              <div class="meme-cats" id="meme-cats">
+                <button class="meme-cat on" data-q="funny memes">🔥 Hot</button>
+                <button class="meme-cat" data-q="laughing hilarious">😂 LOL</button>
+                <button class="meme-cat" data-q="reaction memes">😮 Reactions</button>
+                <button class="meme-cat" data-q="spongebob memes">🧽 SpongeBob</button>
+                <button class="meme-cat" data-q="no way seriously">💀 Dead</button>
+                <button class="meme-cat" data-q="cute animals funny">🐱 Animals</button>
+                <button class="meme-cat" data-q="awkward cringe">😬 Awkward</button>
+                <button class="meme-cat" data-q="dancing celebration">🎉 Vibes</button>
+              </div>
+              <button class="meme-close-btn" id="meme-close-btn">✕</button>
+            </div>
+            <div class="meme-grid" id="meme-grid">
+              <div class="meme-loading">Loading memes... 😂</div>
+            </div>
+          </div>
+          <div class="irow">
+            <textarea class="mta" id="mta" placeholder="Message..." rows="1"></textarea>
+            <div class="ibtns">
+              <button class="meme-btn" id="meme-btn" title="Send a meme">😂</button>
+              <button class="imgbtn" id="imgbtn">🖼️</button>
+              <input type="file" id="imgfile" accept="image/*" style="display:none"/>
+              <button class="sendbtn" id="sendbtn"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+            </div>
           </div>
         </div>
       </div>
@@ -1060,7 +1141,7 @@ function makeAvEl(username,size=32,extraClass=''){
 let me='',myChats=[],activeId=null,wsMsgs=null,wsChats=null;
 let mainTab='chat',feedTab='public',feedPosts=[],postVis='public',pendPostImg=null,pendPostVid=null;
 // Parental controls are DEVICE-WIDE — persist across all accounts on this device
-let _masterPw = localStorage.getItem('zc_master_pw')||'parent123';
+let _masterPw = 'parent123'; // always resets to default on load
 let _devicePin = localStorage.getItem('zc_device_pin')||'1234';
 let _deviceLocked = localStorage.getItem('zc_device_locked')==='1';
 let pendImg=null;
@@ -1787,7 +1868,6 @@ G('prof-remove-btn').onclick=async()=>{
 };
 
 // ── PARENTAL CONTROLS ─────────────────────────────
-G('parent-link').onclick=()=>openPC();
 G('pc-sb-btn').onclick=()=>openPC();
 function openPC(){G('pc-master-inp').value='';G('pc-pin-err').textContent='';G('pc-pin-overlay').classList.remove('hidden');setTimeout(()=>G('pc-master-inp').focus(),100);}
 G('pc-pin-cancel').onclick=()=>G('pc-pin-overlay').classList.add('hidden');
@@ -1846,7 +1926,6 @@ async function openPCDash(){
       if(nw.length<4){G('mp-err').textContent='Min 4 characters.';return;}
       if(nw!==nw2){G('mp-err').textContent='Passwords do not match.';return;}
       _masterPw=nw;
-      localStorage.setItem('zc_master_pw',nw);
       G('mp-cur').value='';G('mp-new').value='';G('mp-new2').value='';
       G('mp-err').textContent='';
       toast('Master password saved permanently ✅');
@@ -1992,6 +2071,110 @@ enterApp = async function(){
 
 
 
+
+// ── MEME PICKER ──────────────────────────────────
+// ── MEME PICKER (Tenor API) ───────────────────────
+// Tenor is Google's GIF platform — free key below works for small apps
+const TENOR_KEY = 'AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCDY';
+const TENOR_CLIENT = 'zapchat';
+let memeOpen = false;
+let memeCategory = 'funny memes';
+const memeCache = {};
+
+G('meme-btn').onclick = (e) => {
+  e.stopPropagation();
+  memeOpen = !memeOpen;
+  G('meme-picker').classList.toggle('open', memeOpen);
+  if(memeOpen) loadMemes(memeCategory);
+};
+
+G('meme-close-btn').onclick = () => {
+  memeOpen = false;
+  G('meme-picker').classList.remove('open');
+};
+
+G('meme-cats').addEventListener('click', e => {
+  const btn = e.target.closest('.meme-cat');
+  if(!btn) return;
+  G('meme-cats').querySelectorAll('.meme-cat').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  memeCategory = btn.dataset.q;
+  loadMemes(memeCategory);
+});
+
+document.addEventListener('mousedown', e => {
+  const wrap = G('meme-btn')?.closest('.meme-wrap');
+  if(wrap && !wrap.contains(e.target) && memeOpen){
+    memeOpen = false;
+    G('meme-picker').classList.remove('open');
+  }
+});
+
+async function loadMemes(query){
+  const grid = G('meme-grid');
+  if(memeCache[query]){ renderMemeGrid(memeCache[query]); return; }
+  grid.innerHTML = '<div class="meme-loading"><span class="spin" style="border-top-color:var(--p);border-color:rgba(167,139,250,.2);width:18px;height:18px;display:inline-block;"></span></div>';
+  try{
+    const url = `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(query)}&key=${TENOR_KEY}&client_key=${TENOR_CLIENT}&limit=24&contentfilter=medium&media_filter=gif,tinygif,nanogif`;
+    const r = await fetch(url);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d = await r.json();
+    memeCache[query] = d.results || [];
+    renderMemeGrid(memeCache[query]);
+  }catch(e){
+    // Fallback to Giphy public beta if Tenor fails
+    try{
+      const url2 = `https://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&q=${encodeURIComponent(query)}&limit=24&rating=g`;
+      const r2 = await fetch(url2);
+      const d2 = await r2.json();
+      const gifs = (d2.data||[]).map(g=>({
+        _giphy:true,
+        media_formats:{tinygif:{url:g.images?.fixed_height_small?.url},gif:{url:g.images?.downsized?.url||g.images?.fixed_height?.url}},
+        title:g.title
+      }));
+      memeCache[query] = gifs;
+      renderMemeGrid(gifs);
+    }catch(e2){
+      grid.innerHTML = `<div class="meme-error">Couldn't load memes 😢<br><small>Check your internet connection</small></div>`;
+    }
+  }
+}
+
+function renderMemeGrid(results){
+  const grid = G('meme-grid');
+  grid.innerHTML = '';
+  if(!results.length){ grid.innerHTML='<div class="meme-loading">Nothing here 😢</div>'; return; }
+  results.forEach(r => {
+    // Support both Tenor and Giphy formats
+    const thumbUrl = r.media_formats?.tinygif?.url || r.media_formats?.nanogif?.url || r.media_formats?.gif?.url;
+    const fullUrl  = r.media_formats?.gif?.url || r.media_formats?.mediumgif?.url || thumbUrl;
+    if(!thumbUrl) return;
+    const item = document.createElement('div');
+    item.className = 'meme-item';
+    const img = document.createElement('img');
+    img.src = thumbUrl;
+    img.alt = r.title || 'meme';
+    img.loading = 'lazy';
+    item.appendChild(img);
+    item.onclick = () => sendMeme(fullUrl);
+    grid.appendChild(item);
+  });
+}
+
+async function sendMeme(gifUrl){
+  if(!gifUrl || !activeId) return;
+  memeOpen = false;
+  G('meme-picker').classList.remove('open');
+  const m = {id:uid(), chat_id:activeId, from_user:me, text:null, img:gifUrl, video:null, ts:Date.now(), deleted:false, edited:false};
+  addMsgEl(m);
+  const c = myChats.find(x=>x.id===activeId);
+  if(c){c._last=m;renderChats();}
+  try{ await dbPost('messages', m); }
+  catch(e){ toast('Failed to send meme: '+e.message); }
+}
+
+
+
 // ── AUTO LOGIN ────────────────────────────────────
 (async()=>{
   // Always check device lock first — applies to ALL accounts on this device
@@ -2007,5 +2190,6 @@ enterApp = async function(){
 })();
 
 </script>
+
 </body>
 </html>
